@@ -164,11 +164,7 @@ ${fragment.foot_html()}
   <div class="course-wrapper" role="presentation">
 
 % if disable_accordion is UNDEFINED or not disable_accordion:
-    <div class="course-index">
-      <header id="open_close_accordion">
-        <a href="#">${_("close")}</a>
-      </header>
-
+    <div class="course-index" role="navigation">
       % if settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH'):
         <div id="courseware-search-bar" class="search-bar courseware-search-bar" role="search" aria-label="Course">
           <form>
@@ -186,7 +182,7 @@ ${fragment.foot_html()}
         </div>
       % endif
 
-      <div id="accordion" style="display: none">
+      <div id="accordion">
         <nav aria-label="${_('Course Navigation')}">
           % if accordion.strip():
             ${accordion}
