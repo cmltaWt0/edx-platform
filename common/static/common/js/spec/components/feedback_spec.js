@@ -54,6 +54,8 @@
         this.renderSpy = spyOn(AlertView.Confirmation.prototype, 'render').andCallThrough();
         this.showSpy = spyOn(AlertView.Confirmation.prototype, 'show').andCallThrough();
         this.hideSpy = spyOn(AlertView.Confirmation.prototype, 'hide').andCallThrough();
+        this.inFocusSpy = spyOn(PromptView.Confirmation.prototype, 'inFocus').andCallThrough();
+        this.outFocusSpy = spyOn(PromptView.Confirmation.prototype, 'outFocus').andCallThrough();
         return this.clock = sinon.useFakeTimers();
       });
       afterEach(function() {
@@ -94,6 +96,16 @@
         view = new AlertView.Confirmation(this.options);
         expect(this.renderSpy).not.toHaveBeenCalled();
         return expect(this.showSpy).not.toHaveBeenCalled();
+      });
+      it("is focused on show", function() {
+        var view;
+        view = new PromptView.Confirmation(this.options).show();
+        return expect(this.inFocusSpy).toHaveBeenCalled();
+      });
+      it("is not focused on hide", function() {
+        var view;
+        view = new PromptView.Confirmation(this.options).hide();
+        return expect(this.outFocusSpy).toHaveBeenCalled();
       });
       xit("renders the template", function() {
         var view;
