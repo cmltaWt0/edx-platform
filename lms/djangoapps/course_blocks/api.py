@@ -7,7 +7,7 @@ from django.core.cache import get_cache
 from openedx.core.lib.block_cache.block_cache import get_blocks, clear_block_cache
 from xmodule.modulestore.django import modulestore
 
-from transformers import start_date, user_partitions, visibility
+from transformers import start_date, user_partitions, visibility, split_test
 from user_info import CourseUserInfo
 
 
@@ -15,6 +15,7 @@ LMS_COURSE_TRANSFORMERS = {
     visibility.VisibilityTransformer(),
     start_date.StartDateTransformer(),
     user_partitions.UserPartitionTransformer(),
+    split_test.SplitTestTransformer(),
 }
 
 _cache = None
