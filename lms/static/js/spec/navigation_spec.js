@@ -66,7 +66,7 @@ define(['jquery', 'js/utils/navigation'], function($) {
                     });
                     expect(chapterContent.first()).toHaveAttr({
                         'aria-expanded': 'true'
-                    })
+                    });
                 });
             });
         });
