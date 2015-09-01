@@ -24,7 +24,6 @@ class ContentLibraryTransformer(BlockStructureTransformer):
         Returns:
             dict[UsageKey: dict]
         """
-
         # For each block check if block is library_content. 
         # If library_content add children array to content_library_children field
         for block_key in block_structure.topological_traversal():
@@ -55,10 +54,10 @@ class ContentLibraryTransformer(BlockStructureTransformer):
 
         children = []
         selected_children = []
-        for block_key in block_structure.get_block_keys:
-            library_children = block_structure.get_transformation_data(block_key, self, 'content_library_children')
-            children.extend(library_children)
+        for block_key in block_structure.get_block_keys():
+            library_children = block_structure.get_transformer_block_data(block_key, self, 'content_library_children')
             if library_children:
+                children.extend(library_children)
                 # Retrieve "selected" json from LMS MySQL database.
                 modules = StudentModule.objects.filter(
                     student=user_info.user,
