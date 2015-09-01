@@ -184,6 +184,9 @@ FEATURES = {
 
     # Timed or Proctored Exams
     'ENABLE_PROCTORED_EXAMS': False,
+
+    # Enable django-sudo
+    'ENABLE_DJANGO_SUDO': True,
 }
 
 ENABLE_JASMINE = False
@@ -322,9 +325,6 @@ MIDDLEWARE_CLASSES = (
 
     # catches any uncaught RateLimitExceptions and returns a 403 instead of a 500
     'ratelimitbackend.middleware.RateLimitMiddleware',
-
-    # force re-authentication before activating administrative functions
-    'sudo.middleware.SudoMiddleware',
 
     # for expiring inactive sessions
     'session_inactivity_timeout.middleware.SessionInactivityTimeout',
@@ -779,10 +779,6 @@ INSTALLED_APPS = (
     'openedx.core.djangoapps.credit',
 
     'xblock_django',
-
-    # Allows sudo-mode
-    'sudo',
-    'django_sudo_helpers'
 )
 
 
@@ -1056,3 +1052,14 @@ PROCTORING_BACKEND_PROVIDER = {
     'options': {},
 }
 PROCTORING_SETTINGS = {}
+
+########## django-sudo ##########
+if FEATURES.get('ENABLE_DJANGO_SUDO', False):
+    # force re-authentication before activating administrative functions
+    MIDDLEWARE_CLASSES += ('sudo.middleware.SudoMiddleware',)
+
+    # Allows sudo-mode
+    INSTALLED_APPS += (
+        'sudo',
+        'django_sudo_helpers'
+    )

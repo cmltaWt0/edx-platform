@@ -520,3 +520,6 @@ PROFILE_IMAGE_MIN_BYTES = 100
 FEATURES['ENABLE_LTI_PROVIDER'] = True
 INSTALLED_APPS += ('lti_provider',)
 AUTHENTICATION_BACKENDS += ('lti_provider.users.LtiBackend',)
+
+######### Django-sudo ##########
+FEATURES['ENABLE_DJANGO_SUDO'] = True

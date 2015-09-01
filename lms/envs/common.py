@@ -415,6 +415,9 @@ FEATURES = {
 
     # Enable the max score cache to speed up grading
     'ENABLE_MAX_SCORE_CACHE': True,
+
+    # Enable django-sudo
+    'ENABLE_DJANGO_SUDO': True,
 }
 
 # Ignore static asset files on import which match this pattern
@@ -1181,9 +1184,6 @@ MIDDLEWARE_CLASSES = (
     # catches any uncaught RateLimitExceptions and returns a 403 instead of a 500
     'ratelimitbackend.middleware.RateLimitMiddleware',
 
-    # force re-authentication before activating administrative functions
-    'sudo.middleware.SudoMiddleware',
-
     # needs to run after locale middleware (or anything that modifies the request context)
     'edxmako.middleware.MakoMiddleware',
 
@@ -1917,10 +1917,6 @@ INSTALLED_APPS = (
     # Surveys
     'survey',
 
-    # Allows sudo-mode
-    'sudo',
-    'django_sudo_helpers',
-
     'lms.djangoapps.lms_xblock',
 
     'openedx.core.djangoapps.content.course_overviews',
@@ -2592,3 +2588,14 @@ JWT_ISSUER = None
 # Credit notifications settings
 NOTIFICATION_EMAIL_CSS = "templates/credit_notifications/credit_notification.css"
 NOTIFICATION_EMAIL_EDX_LOGO = "templates/credit_notifications/edx-logo-header.png"
+
+########## django-sudo ##########
+if FEATURES.get('ENABLE_DJANGO_SUDO', False):
+    # force re-authentication before activating administrative functions
+    MIDDLEWARE_CLASSES += ('sudo.middleware.SudoMiddleware',)
+
+    # Allows sudo-mode
+    INSTALLED_APPS += (
+        'sudo',
+        'django_sudo_helpers'
+    )

@@ -11,6 +11,7 @@ import json
 import requests
 import shutil
 import tempfile
+import unittest
 from urllib import quote
 
 from django.conf import settings
@@ -29,6 +30,7 @@ from nose.tools import raises
 from nose.plugins.attrib import attr
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
+from django_sudo_helpers.tests import utils
 from course_modes.models import CourseMode
 from courseware.models import StudentModule
 from courseware.tests.factories import StaffFactory, InstructorFactory, BetaTesterFactory, UserProfileFactory
@@ -306,6 +308,7 @@ class TestInstructorAPIDenyLevels(ModuleStoreTestCase, LoginEnrollmentTestCase):
                 "Staff member should not be allowed to access endpoint " + endpoint
             )
 
+    @unittest.skipUnless(utils.DJANGO_SUDO_FEATURE_ENABLED, 'django-sudo not enabled')
     def test_staff_level_without_sudo_access(self):
         """
         Ensure that a staff member redirected to sudo password page without sudo access.
@@ -356,6 +359,7 @@ class TestInstructorAPIDenyLevels(ModuleStoreTestCase, LoginEnrollmentTestCase):
                 "Instructor should be allowed to access endpoint " + endpoint
             )
 
+    @unittest.skipUnless(utils.DJANGO_SUDO_FEATURE_ENABLED, 'django-sudo not enabled')
     def test_instructor_level_without_sudo_access(self):
         """
         Ensure that an instructor member redirected to sudo password page without sudo access.

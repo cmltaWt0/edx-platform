@@ -493,8 +493,9 @@ class ModuleStoreTestCase(TestCase):
         """
         Grant sudo access to staff or instructor user.
         """
-        self.client.post(
-            '/sudo/?region={}'.format(region_name(region)),
-            {'password': password},
-            follow=True
-        )
+        if settings.FEATURES.get('ENABLE_DJANGO_SUDO', False):
+            self.client.post(
+                '/sudo/?region={}'.format(region_name(region)),
+                {'password': password},
+                follow=True
+            )
