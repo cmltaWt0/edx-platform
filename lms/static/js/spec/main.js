@@ -712,7 +712,7 @@
         'lms/include/teams/js/spec/views/topic_card_spec.js',
         'lms/include/teams/js/spec/views/topic_teams_spec.js',
         'lms/include/teams/js/spec/views/topics_spec.js',
-        'lms/include/teams/js/spec/views/team_profile_header_actions_spec.js'
+        'lms/include/teams/js/spec/views/team_profile_header_actions_spec.js',
         'lms/include/teams/js/spec/views/team_join_spec.js',
         'lms/include/js/spec/navigation_spec.js'
     ]);
