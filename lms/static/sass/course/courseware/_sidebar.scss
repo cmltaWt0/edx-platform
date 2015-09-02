@@ -5,7 +5,7 @@
     display: table-cell; // needed to extend the sidebar the full height of the area
 
     // reseting bolded fonts for the course index
-    h3 {
+    .group-heading {
         @extend %t-regular;
     }
 
@@ -25,7 +25,7 @@
                 padding: 0;
                 box-shadow: 0 1px 0 $white inset, 0 -1px 0 $shadow-l1 inset;
                 background-color: $sidebar-chapter-bg;
-                color: $link-color;
+                color: $blue-d1;
 
                 &.is-open {
                     background: $white;
@@ -43,8 +43,9 @@
                 .group-heading {
                     @extend %t-title6;
                     position: relative;
+                    display: block;
                     padding: ($baseline*.75) $baseline ($baseline*.75) ($baseline*2);
-                    color: $link-color;
+                    @include text-align(left);
 
                     .icon {
                         position: absolute;
@@ -67,10 +68,10 @@
                     outline: none;
                 }
 
-                .chapter-menu {
-                    padding: 0 ($baseline*.75);
-                    background: inherit;
-                    overflow: hidden;
+                // .chapter-menu {
+                //     padding: 0 ($baseline*.75);
+                //     background: inherit;
+                //     overflow: hidden;
 
                     .menu-item {
                         @extend %t-strong;
@@ -154,7 +155,7 @@
                             }
                         }
                     }
-                }
+                // }
             }
         }
     }

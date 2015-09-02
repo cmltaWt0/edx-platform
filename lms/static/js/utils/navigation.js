@@ -18,7 +18,7 @@ var edx = edx || {},
             },
 
             checkForCurrent: function() {
-                var active = $('.accordion .chapter-content-container .chapter-menu:has(.active)').index('.accordion .chapter-content-container .chapter-menu') ? $('.accordion .chapter-content-container .chapter-menu:has(.active)').index('.accordion .chapter-content-container .chapter-menu') : 0,
+                var active = $('.accordion .chapter-content-container:has(.active)').index('.accordion .chapter-content-container') ? $('.accordion .chapter-content-container:has(.active)').index('.accordion .chapter-content-container') : 0,
                     activeSection = $('.accordion .button-chapter:eq(' + active + ')');
 
                 navigation.closeAccordions();
@@ -34,12 +34,11 @@ var edx = edx || {},
 
             closeAccordions: function() {
                 $('.chapter-content-container').hide();
-                $('.chapter-content-container .chapter-menu').hide();
 
                 $('.accordion .button-chapter').each(function(event) {
                     var el = $(this);
 
-                    el.removeClass('is-open').attr('aria-pressed', 'false');
+                    el.removeClass('is-open').attr('aria-expanded', 'false');
                     el.next('.chapter-content-container').attr('aria-expanded', 'false');
                     el.children('.group-heading').removeClass('active');
                     el.children('.group-heading').find('.icon').addClass('fa-caret-right').removeClass('fa-caret-down');
@@ -50,9 +49,8 @@ var edx = edx || {},
                 var elSection = $(section).next('.chapter-content-container');
 
                 elSection.show().focus();
-                elSection.find('.chapter-menu').show();
 
-                $(section).addClass('is-open').attr('aria-pressed', 'true');
+                $(section).addClass('is-open').attr('aria-expanded', 'true');
                 $(section).next('.chapter-content-container').attr('aria-expanded', 'true');
                 $(section).children('.group-heading').addClass('active');
                 $(section).children('.group-heading').find('.icon').removeClass('fa-caret-right').addClass('fa-caret-down');
