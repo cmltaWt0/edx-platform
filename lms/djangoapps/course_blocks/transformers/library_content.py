@@ -1,5 +1,5 @@
 """
-...
+Content Library Transformer, used to filter course structure per user.
 """
 import json
 from courseware.access import _has_access_to_course
@@ -9,22 +9,45 @@ from openedx.core.lib.block_cache.transformer import BlockStructureTransformer
 
 
 class ContentLibraryTransformer(BlockStructureTransformer):
-
+    """
+    Content Library Transformer Class
+    """
     VERSION = 1
+
+    @classmethod
+    def _get_selected_modules(cls, user, course_key, block_key):
+        """
+        Get list of selected modules in a library,
+        for user.
+
+        Arguments:
+            user (User)
+            course_key (CourseLocator)
+            block_key (BlockUsageLocator)
+
+        Returns:
+            list[modules]
+        """
+        return StudentModule.objects.filter(
+            student=user,
+            course_id=course_key,
+            module_state_key=block_key,
+            state__contains='"selected": [['
+        )
 
     @classmethod
     def collect(cls, block_structure):
         """
         Computes any information for each XBlock that's necessary to execute
-        this transformation's apply method.
+        this transformer's transform method.
 
         Arguments:
-            block_structure (CourseBlockStructure)
+            block_structure (BlockStructureCollectedData)
 
         Returns:
             dict[UsageKey: dict]
         """
-        # For each block check if block is library_content. 
+        # For each block check if block is library_content.
         # If library_content add children array to content_library_children field
         for block_key in block_structure.topological_traversal():
             xblock = block_structure.get_xblock(block_key)
@@ -37,13 +60,14 @@ class ContentLibraryTransformer(BlockStructureTransformer):
         Mutates block_structure and block_data based on the given user_info.
 
         Arguments:
-            user_info
-            block_structure (CourseBlockStructure)
+            user_info(object)
+            block_structure (BlockStructureCollectedData)
         """
+
         def check_child_removal(block_key):
             """
-            Check if selected block should be removed. 
-            Block is removed if it is part of library_content, but has not been selected 
+            Check if selected block should be removed.
+            Block is removed if it is part of library_content, but has not been selected
             for current user.
             """
             if block_key not in children:
@@ -59,18 +83,13 @@ class ContentLibraryTransformer(BlockStructureTransformer):
             if library_children:
                 children.extend(library_children)
                 # Retrieve "selected" json from LMS MySQL database.
-                modules = StudentModule.objects.filter(
-                    student=user_info.user,
-                    course_id=user_info.course_key,
-                    module_state_key=block_key, 
-                    state__contains='"selected": [['
-                )
+                modules = self._get_selected_modules(user_info.user, user_info.course_key, block_key)
                 for module in modules:
                     module_state = module.state
                     state_dict = json.loads(module_state)
                     # Check all selected entries for this user on selected library.
                     # Add all selected to selected_children list.
-                    for state in state_dict['selected']:                        
+                    for state in state_dict['selected']:
                         usage_key = BlockUsageLocator(
                             user_info.course_key, block_type=state[0], block_id=state[1]
                         )
@@ -81,4 +100,4 @@ class ContentLibraryTransformer(BlockStructureTransformer):
         if not _has_access_to_course(user_info.user, 'staff', user_info.course_key):
             block_structure.remove_block_if(
                 check_child_removal
-            ) 
+            )

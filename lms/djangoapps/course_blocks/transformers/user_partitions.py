@@ -1,14 +1,13 @@
 """
-...
+User Partitions Transformer, used to filter course structure per user.
 """
-from courseware.access import _has_access_to_course
 from openedx.core.lib.block_cache.transformer import BlockStructureTransformer
 from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartitionScheme
 from openedx.core.djangoapps.course_groups.partition_scheme import CohortPartitionScheme
 
 # TODO 8874: Make it so we support all schemes instead of manually declaring them here.
-INCLUDE_SCHEMES = [CohortPartitionScheme, RandomUserPartitionScheme,]
-SCHEME_SUPPORTS_ASSIGNMENT = [RandomUserPartitionScheme,]
+INCLUDE_SCHEMES = [CohortPartitionScheme, RandomUserPartitionScheme, ]
+SCHEME_SUPPORTS_ASSIGNMENT = [RandomUserPartitionScheme, ]
 
 
 class MergedGroupAccess(object):
@@ -156,15 +155,10 @@ class UserPartitionTransformer(BlockStructureTransformer):
     def collect(cls, block_structure):
         """
         Computes any information for each XBlock that's necessary to execute
-        this transformation's apply method.
+        this transformer's transform method.
 
         Arguments:
-            course_key (CourseKey)
-            block_structure (BlockStructure)
-            xblock_dict (dict[UsageKey: XBlock])
-
-        Returns:
-            dict[UsageKey: dict]
+            block_structure (BlockStructureCollectedData)
         """
         # Because user partitions are course-wide, only store data for them on the root block.
         root_block = block_structure.get_xblock(block_structure.root_block_key)
@@ -192,8 +186,13 @@ class UserPartitionTransformer(BlockStructureTransformer):
     def transform(self, user_info, block_structure):
         """
         Mutates block_structure and block_data based on the given user_info.
+
+        Arguments:
+            user_info (object)
+            block_structure (BlockStructureCollectedData)
         """
-        # TODO 8874: Factor out functionality of UserPartitionTransformation.apply and access._has_group_access into a common utility function.
+        # TODO 8874: Factor out functionality of UserPartitionTransformation.transform and
+        # access._has_group_access into a common utility function.
         user_partitions = block_structure.get_transformer_data(self, 'user_partitions')
 
         # If there are no user partitions, this transformation is a no-op,

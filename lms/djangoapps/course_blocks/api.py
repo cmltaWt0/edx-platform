@@ -7,8 +7,8 @@ from django.core.cache import get_cache
 from openedx.core.lib.block_cache.block_cache import get_blocks, clear_block_cache
 from xmodule.modulestore.django import modulestore
 
-from transformers import start_date, user_partitions, visibility, split_test, library_content
-from user_info import CourseUserInfo
+from lms.djangoapps.course_blocks.transformers import start_date, user_partitions, visibility, split_test, library_content
+from lms.djangoapps.course_blocks.user_info import CourseUserInfo
 
 
 LMS_COURSE_TRANSFORMERS = {
@@ -20,6 +20,8 @@ LMS_COURSE_TRANSFORMERS = {
 }
 
 _cache = None
+
+
 def _get_cache():
     global _cache
     if not _cache:
