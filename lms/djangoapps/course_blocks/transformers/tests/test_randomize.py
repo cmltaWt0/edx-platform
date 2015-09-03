@@ -1,18 +1,18 @@
 """
-Tests for ContentLibraryTransformer.
+Tests for RandomizeTransformer.
 """
 import mock
 from student.tests.factories import UserFactory
 from student.tests.factories import CourseEnrollmentFactory
 
-from course_blocks.transformers.library_content import ContentLibraryTransformer
+from course_blocks.transformers.randomize import RandomizeTransformer
 from course_blocks.api import get_course_blocks, clear_course_from_cache
 from lms.djangoapps.course_blocks.transformers.tests.test_helpers import CourseStructureTestCase
 
 
 class MockedModules(object):
     """
-    Object with mocked selected modules for user.
+    Object with mocked chosen module for user.
     """
     def __init__(self, state):
         """
@@ -21,16 +21,16 @@ class MockedModules(object):
         self.state = state
 
 
-class ContentLibraryTransformerTestCase(CourseStructureTestCase):
+class RandomizeTransformerTestCase(CourseStructureTestCase):
     """
-    ContentLibraryTransformer Test
+    RandomizeTransformer Test
     """
 
     def setUp(self):
         """
-        Setup course structure and create user for content library transformer test.
+        Setup course structure and create user for randomize transformer test.
         """
-        super(ContentLibraryTransformerTestCase, self).setUp()
+        super(RandomizeTransformerTestCase, self).setUp()
 
         # Build course.
         self.course_hierarchy = self.get_test_course_hierarchy()
@@ -43,7 +43,7 @@ class ContentLibraryTransformerTestCase(CourseStructureTestCase):
         self.user = UserFactory.create(password=self.password)
         CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id, is_active=True)
 
-        self.selected_modules = [MockedModules('{"selected": [["vertical", "vertical_vertical2"]]}')]
+        self.chosen_module = [MockedModules('{"choice": 1}')]
         self.transformer = []
 
     def get_test_course_hierarchy(self):
@@ -51,8 +51,8 @@ class ContentLibraryTransformerTestCase(CourseStructureTestCase):
         Get a course hierarchy to test with.
         """
         return {
-            'org': 'ContentLibraryTransformer',
-            'course': 'CL101F',
+            'org': 'RandomizeTransformer',
+            'course': 'RT101F',
             'run': 'test_run',
             '#ref': 'course',
             '#children': [
@@ -69,33 +69,19 @@ class ContentLibraryTransformerTestCase(CourseStructureTestCase):
                                     '#ref': 'vertical1',
                                     '#children': [
                                         {
-                                            'metadata': {'category': 'library_content'},
-                                            '#type': 'library_content',
-                                            '#ref': 'library_content1',
+                                            'metadata': {'category': 'randomize'},
+                                            '#type': 'randomize',
+                                            '#ref': 'randomize1',
                                             '#children': [
                                                 {
-                                                    'metadata': {'display_name': "CL Vertical 1"},
-                                                    '#type': 'vertical',
-                                                    '#ref': 'vertical2',
-                                                    '#children': [
-                                                        {
-                                                            'metadata': {'display_name': "HTML1"},
-                                                            '#type': 'html',
-                                                            '#ref': 'html1',
-                                                        }
-                                                    ]
+                                                    'metadata': {'display_name': "HTML1"},
+                                                    '#type': 'html',
+                                                    '#ref': 'html1',
                                                 },
                                                 {
-                                                    'metadata': {'display_name': "CL Vertical 2"},
-                                                    '#type': 'vertical',
-                                                    '#ref': 'vertical3',
-                                                    '#children': [
-                                                        {
-                                                            'metadata': {'display_name': "HTML2"},
-                                                            '#type': 'html',
-                                                            '#ref': 'html2',
-                                                        }
-                                                    ]
+                                                    'metadata': {'display_name': "HTML2"},
+                                                    '#type': 'html',
+                                                    '#ref': 'html2',
                                                 }
                                             ]
                                         }
@@ -108,14 +94,14 @@ class ContentLibraryTransformerTestCase(CourseStructureTestCase):
             ]
         }
 
-    def test_course_structure_with_user_course_library(self):
+    def test_course_structure_with_user_randomize(self):
         """
-        Test course structure integrity if course has content library section.
-        First test user can't see any content library section,
+        Test course structure integrity if course has randomize block section.
+        First test user can't see any randomize block section,
         and after that mock response from MySQL db.
-        Check user can see mocked sections in content library.
+        Check user can see mocked section in randomize block.
         """
-        self.transformer = ContentLibraryTransformer()
+        self.transformer = RandomizeTransformer()
 
         raw_block_structure = get_course_blocks(
             self.user,
@@ -135,13 +121,13 @@ class ContentLibraryTransformerTestCase(CourseStructureTestCase):
 
         self.assertEqual(
             set(trans_block_structure.get_block_keys()),
-            self.get_block_key_set('course', 'chapter1', 'lesson1', 'vertical1', 'library_content1')
+            self.get_block_key_set('course', 'chapter1', 'lesson1', 'vertical1', 'randomize1')
         )
 
         # Check course structure again, with mocked selected modules for a user.
         with mock.patch(
-            'course_blocks.transformers.library_content.ContentLibraryTransformer._get_selected_modules',
-            return_value=self.selected_modules
+            'course_blocks.transformers.randomize.RandomizeTransformer._get_chosen_modules',
+            return_value=self.chosen_module
         ):
             clear_course_from_cache(self.course.id)
             trans_block_structure = get_course_blocks(
@@ -157,8 +143,7 @@ class ContentLibraryTransformerTestCase(CourseStructureTestCase):
                     'chapter1',
                     'lesson1',
                     'vertical1',
-                    'library_content1',
-                    'vertical2',
-                    'html1'
+                    'randomize1',
+                    'html2'
                 )
             )

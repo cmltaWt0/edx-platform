@@ -1,5 +1,5 @@
 """
-Tests for UserPartitionTransformation.
+Tests for UserPartitionTransformer.
 """
 
 from openedx.core.djangoapps.course_groups.partition_scheme import CohortPartitionScheme
