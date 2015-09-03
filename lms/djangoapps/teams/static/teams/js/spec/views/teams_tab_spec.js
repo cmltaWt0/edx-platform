@@ -1,10 +1,11 @@
 define([
     'jquery',
     'backbone',
+    'logger',
     'common/js/spec_helpers/ajax_helpers',
     'teams/js/views/teams_tab',
     'teams/js/spec_helpers/team_spec_helpers'
-], function ($, Backbone, AjaxHelpers, TeamsTabView, TeamSpecHelpers) {
+], function ($, Backbone, Logger, AjaxHelpers, TeamsTabView, TeamSpecHelpers) {
     'use strict';
 
     describe('TeamsTab', function () {
@@ -34,9 +35,39 @@ define([
             return teamsTabView;
         };
 
+        var verifyTeamsRequest = function(requests, queryParams) {
+            AjaxHelpers.expectRequestURL(requests, TeamSpecHelpers.testContext.teamsUrl,
+                                         _.extend(
+                                             {
+                                                 topic_id: TeamSpecHelpers.testTopicID,
+                                                 expand: 'user',
+                                                 course_id: TeamSpecHelpers.testCourseID,
+                                                 order_by: '',
+                                                 page: '1',
+                                                 page_size: '10',
+                                                 text_search: ''
+                                             },
+                                             queryParams
+                                         ));
+        };
+
+        /**
+         * Filters out all team events from a list of requests.
+         */
+        var removeTeamEvents = function (requests) {
+            return requests.filter(function (request) {
+                if (request.requestBody && request.requestBody.startsWith('event_type=edx.team')) {
+                    return false;
+                } else {
+                    return true;
+                }
+            });
+        };
+
         beforeEach(function () {
             setFixtures('<div class="teams-content"></div>');
             spyOn($.fn, 'focus');
+            spyOn(Logger, 'log');
         });
 
         afterEach(function () {
@@ -44,17 +75,17 @@ define([
         });
 
         describe('Navigation', function () {
+            it('does not interfere with anchor links to #content', function () {
+                var teamsTabView = createTeamsTabView();
+                teamsTabView.router.navigate('#content', {trigger: true});
+                expect(teamsTabView.$('.warning')).toHaveClass('is-hidden');
+            });
+
             it('displays and focuses an error message when trying to navigate to a nonexistent page', function () {
                 var teamsTabView = createTeamsTabView();
                 teamsTabView.router.navigate('no_such_page', {trigger: true});
                 expectError(teamsTabView, 'The page "no_such_page" could not be found.');
                 expectFocus(teamsTabView.$('.warning'));
-            });
-
-            it('does not interfere with anchor links to #content', function () {
-                var teamsTabView = createTeamsTabView();
-                teamsTabView.router.navigate('#content', {trigger: true});
-                expect(teamsTabView.$('.warning')).toHaveClass('is-hidden');
             });
 
             it('displays and focuses an error message when trying to navigate to a nonexistent topic', function () {
@@ -75,6 +106,74 @@ define([
                 AjaxHelpers.respondWithError(requests, 404);
                 expectError(teamsTabView, 'The team "no_such_team" could not be found.');
                 expectFocus(teamsTabView.$('.warning'));
+            });
+        });
+
+        describe('Analytics Events', function () {
+            beforeEach(function () {
+            //    TODO: createTeamsTabView, navigate to browse teams page...
+            });
+            it('fires a page view event for the topic page', function () {
+                var requests = AjaxHelpers.requests(this),
+                    teamsTabView = createTeamsTabView();
+                teamsTabView.router.navigate('topics/' + TeamSpecHelpers.testTopicID, {trigger: true});
+                AjaxHelpers.respondWithJson(requests, {});
+                expect(Logger.log).toHaveBeenCalledWith('edx.team.page_viewed', {
+                    page_name: 'single-topic',
+                    topic_id: TeamSpecHelpers.testTopicID,
+                    team_id: null
+                });
+            });
+
+            it('fires a page view event for the team page', function () {
+                var requests = AjaxHelpers.requests(this),
+                    teamsTabView = createTeamsTabView(),
+                    team_id = 'test_team_id';
+                teamsTabView.router.navigate('teams/' + TeamSpecHelpers.testTopicID + '/' + team_id, {trigger: true});
+                AjaxHelpers.respondWithJson(requests, {});
+                expect(Logger.log).toHaveBeenCalledWith('edx.team.page_viewed', {
+                    page_name: 'single-team',
+                    topic_id: TeamSpecHelpers.testTopicID,
+                    team_id: team_id
+                });
+            });
+
+            it('fires a page view event for the search team page', function () {
+                var requests = AjaxHelpers.requests(this),
+                    teamsTabView = createTeamsTabView();
+                teamsTabView.browseTopic(TeamSpecHelpers.testTopicID);
+                teamsTabView.router.navigate('topics/' + TeamSpecHelpers.testTopicID + '/search', {trigger: true});
+                AjaxHelpers.respondWithJson(requests, {});
+                expect(Logger.log).toHaveBeenCalledWith('edx.team.page_viewed', {
+                    page_name: 'search-teams',
+                    topic_id: TeamSpecHelpers.testTopicID,
+                    team_id: null
+                });
+            });
+
+            it('fires a page view event for the new team page', function () {
+                var teamsTabView = createTeamsTabView();
+                teamsTabView.router.navigate('topics/' + TeamSpecHelpers.testTopicID + '/create-team', {trigger: true});
+                expect(Logger.log).toHaveBeenCalledWith('edx.team.page_viewed', {
+                    page_name: 'new-team',
+                    topic_id: TeamSpecHelpers.testTopicID,
+                    team_id: null
+                });
+            });
+
+            it('fires a page view event for the edit team page', function () {
+                var requests = AjaxHelpers.requests(this),
+                    teamsTabView = createTeamsTabView(),
+                    team_id = 'test_team_id';
+                teamsTabView.router.navigate('topics/' + TeamSpecHelpers.testTopicID + '/' + team_id + '/edit-team', {
+                    trigger: true
+                });
+                AjaxHelpers.respondWithJson(requests, {});
+                expect(Logger.log).toHaveBeenCalledWith('edx.team.page_viewed', {
+                    page_name: 'edit-team',
+                    topic_id: TeamSpecHelpers.testTopicID,
+                    team_id: team_id
+                });
             });
         });
 
@@ -118,22 +217,6 @@ define([
         });
 
         describe('Search', function () {
-            var verifyTeamsRequest = function(requests, options) {
-                AjaxHelpers.expectRequestURL(requests, TeamSpecHelpers.testContext.teamsUrl,
-                    _.extend(
-                        {
-                            topic_id: TeamSpecHelpers.testTopicID,
-                            expand: 'user',
-                            course_id: TeamSpecHelpers.testCourseID,
-                            order_by: '',
-                            page: '1',
-                            page_size: '10',
-                            text_search: ''
-                        },
-                        options
-                    ));
-            };
-
             it('can search teams', function () {
                 var requests = AjaxHelpers.requests(this),
                     teamsTabView = createTeamsTabView();
@@ -190,7 +273,7 @@ define([
 
                 // Navigate back to the teams list
                 teamsTabView.$('.breadcrumbs a').last().click();
-                verifyTeamsRequest(requests, {
+                verifyTeamsRequest(removeTeamEvents(requests), {
                     order_by: 'last_activity_at',
                     text_search: ''
                 });

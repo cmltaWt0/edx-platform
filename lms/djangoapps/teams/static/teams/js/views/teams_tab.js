@@ -7,12 +7,13 @@
             'common/js/components/views/search_field',
             'js/components/header/views/header',
             'js/components/header/models/header',
-            'js/components/tabbed/views/tabbed_view',
             'teams/js/models/topic',
             'teams/js/collections/topic',
             'teams/js/models/team',
             'teams/js/collections/team',
             'teams/js/collections/team_membership',
+            'teams/js/utils/team_analytics',
+            'teams/js/views/teams_tabbed_view',
             'teams/js/views/topics',
             'teams/js/views/team_profile',
             'teams/js/views/my_teams',
@@ -20,9 +21,9 @@
             'teams/js/views/edit_team',
             'teams/js/views/team_profile_header_actions',
             'text!teams/templates/teams_tab.underscore'],
-        function (Backbone, _, gettext, SearchFieldView, HeaderView, HeaderModel, TabbedView,
-                  TopicModel, TopicCollection, TeamModel, TeamCollection, TeamMembershipCollection,
-                  TopicsView, TeamProfileView, MyTeamsView, TopicTeamsView, TeamEditView,
+        function (Backbone, _, gettext, SearchFieldView, HeaderView, HeaderModel,
+                  TopicModel, TopicCollection, TeamModel, TeamCollection, TeamMembershipCollection, TeamAnalytics,
+                  TeamsTabbedView, TopicsView, TeamProfileView, MyTeamsView, TopicTeamsView, TeamEditView,
                   TeamProfileHeaderActionsView, teamsTemplate) {
             var TeamsHeaderModel = HeaderModel.extend({
                 initialize: function () {
@@ -117,7 +118,7 @@
                     this.mainView = this.tabbedView = this.createViewWithHeader({
                         title: gettext("Teams"),
                         description: gettext("See all teams in your course, organized by topic. Join a team to collaborate with other learners who are interested in the same topic as you are."),
-                        mainView: new TabbedView({
+                        mainView: new TeamsTabbedView({
                             tabs: [{
                                 title: gettext('My Team'),
                                 url: 'my-teams',
@@ -170,6 +171,7 @@
                     this.getTeamsView(topicID).done(function (teamsView) {
                         self.teamsView = self.mainView = teamsView;
                         self.render();
+                        TeamAnalytics.emitPageViewed('single-topic', topicID, null);
                     });
                 },
 
@@ -195,6 +197,7 @@
                                 showSortControls: false
                             });
                             view.render();
+                            TeamAnalytics.emitPageViewed('search-teams', topicID, null);
                         });
                     }
                 },
@@ -217,6 +220,7 @@
                             })
                         });
                         view.render();
+                        TeamAnalytics.emitPageViewed('new-team', topicID, null);
                     });
                 },
 
@@ -244,6 +248,7 @@
                             });
                             self.mainView = editViewWithHeader;
                             self.render();
+                            TeamAnalytics.emitPageViewed('edit-team', topicID, teamID);
                         });
                     });
                 },
@@ -330,6 +335,7 @@
                     this.getBrowseTeamView(topicID, teamID).done(function (browseTeamView) {
                         self.mainView = browseTeamView;
                         self.render();
+                        TeamAnalytics.emitPageViewed('single-team', topicID, teamID);
                     });
                 },
 
