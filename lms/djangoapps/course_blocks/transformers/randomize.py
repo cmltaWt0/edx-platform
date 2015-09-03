@@ -47,8 +47,8 @@ class RandomizeTransformer(BlockStructureTransformer):
         Returns:
             dict[UsageKey: dict]
         """
-        # For each block check if block is library_content.
-        # If library_content add children array to content_library_children field
+        # For each block check if block is randomize.
+        # If randomize add children array to randomize_children field
         for block_key in block_structure.topological_traversal():
             xblock = block_structure.get_xblock(block_key)
             if getattr(xblock, 'category', None) == 'randomize':

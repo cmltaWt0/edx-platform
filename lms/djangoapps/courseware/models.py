@@ -91,8 +91,7 @@ class StudentModule(CallStackMixin, models.Model):
                     ('course', 'course'),
                     ('chapter', 'Section'),
                     ('sequential', 'Subsection'),
-                    ('library_content', 'Library Content'), 
-                    ('randomize', 'Randomize'))
+                    ('library_content', 'Library Content'))
     ## These three are the key for the object
     module_type = models.CharField(max_length=32, choices=MODULE_TYPES, default='problem', db_index=True)
 
