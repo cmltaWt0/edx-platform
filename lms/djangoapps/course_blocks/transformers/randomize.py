@@ -2,9 +2,7 @@
 Randomize Transformer, used to filter course structure per user.
 """
 import json
-from courseware.access import _has_access_to_course
 from courseware.models import StudentModule
-from opaque_keys.edx.locator import BlockUsageLocator
 from openedx.core.lib.block_cache.transformer import BlockStructureTransformer
 
 
@@ -93,7 +91,7 @@ class RandomizeTransformer(BlockStructureTransformer):
                     	chosen_child.append(randomize_children[int(chosen)])
 
         # Check and remove all non-chosen children from course structure.
-        if not _has_access_to_course(user_info.user, 'staff', user_info.course_key):
+        if not user_info.has_staff_access:
             block_structure.remove_block_if(
                 check_child_removal
             )

@@ -1,7 +1,6 @@
 """
 Split Test Block Transformer, used to filter course structure per user.
 """
-from courseware.access import _has_access_to_course
 from openedx.core.lib.block_cache.transformer import BlockStructureTransformer
 from .helpers import get_user_partition_groups
 
@@ -101,7 +100,7 @@ class SplitTestTransformer(BlockStructureTransformer):
             user_info.course_key, user_partitions, user_info.user
         )
 
-        if not _has_access_to_course(user_info.user, 'staff', user_info.course_key):
+        if not user_info.has_staff_access:
             block_structure.remove_block_if(
                 lambda block_key: not SplitTestTransformer.check_split_access(
                     block_structure.get_transformer_block_data(
