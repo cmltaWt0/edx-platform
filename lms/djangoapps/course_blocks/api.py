@@ -17,7 +17,6 @@ LMS_COURSE_TRANSFORMERS = {
     user_partitions.UserPartitionTransformer(),
     split_test.SplitTestTransformer(),
     library_content.ContentLibraryTransformer(),
-    randomize.RandomizeTransformer(),
 }
 
 _cache = None

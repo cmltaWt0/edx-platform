@@ -1,5 +1,8 @@
 """
 Randomize Transformer, used to filter course structure per user.
+
+THIS TRANSFORMER IS CURRENTLY NOT BEING USED. 
+Randomize block is not being supported any more and is about to be removed from the platform. 
 """
 import json
 from courseware.models import StudentModule
