@@ -26,10 +26,6 @@ define(['jquery', 'js/utils/navigation'], function($) {
                 });
 
                 it('ensures aria attributes are present', function() {
-                    expect(button).toHaveAttr({
-                        'aria-pressed': 'true'
-                    });
-
                     expect(chapterContent).toHaveAttr({
                         'aria-expanded': 'true'
                     });
@@ -43,28 +39,24 @@ define(['jquery', 'js/utils/navigation'], function($) {
             describe('open section', function() {
 
                 it('ensures new section is opened and previous section is closed', function() {
-                    button.last().click();
+                    button:eq(1).click();
 
-                    expect(chapterContent.first()).toBeHidden();
-                    expect(chapterContent.last()).not.toBeHidden();
+                    console.log(chapterContent:eq(0), chapterContent:eq(1));
+                    expect(chapterContent:eq(0)).not.toHaveClass('is-open');
+                    expect(chapterContent:eq(1)).toHaveClass('is-open');
 
-                    expect(button.first()).not.toHaveClass('is-open');
-                    expect(button.last()).toHaveClass('is-open');
+                    console.log(button:eq(0), button:eq(1));
+                    expect(button:eq(0)).not.toHaveClass('is-open');
+                    expect(button:eq(1)).toHaveClass('is-open');
 
-                    expect(chapterContent.last().focus).toHaveBeenCalled();
+                    expect(chapterContent:eq(1).focus).toHaveBeenCalled();
                 });
 
                 it('ensure proper aria and attrs', function() {
-                    expect(button.last()).toHaveAttr({
-                        'aria-pressed': 'false'
-                    });
-                    expect(button.first()).toHaveAttr({
-                        'aria-pressed': 'true'
-                    });
-                    expect(chapterContent.last()).toHaveAttr({
+                    expect(chapterContent:eq(1)).toHaveAttr({
                         'aria-expanded': 'false'
                     });
-                    expect(chapterContent.first()).toHaveAttr({
+                    expect(chapterContent:eq(0)).toHaveAttr({
                         'aria-expanded': 'true'
                     });
                 });
