@@ -52,7 +52,7 @@
                 &.active {
 
                     .group-heading {
-                        @extend %t-ultrastrong;
+                        @extend %t-strong;
                         color: $base-font-color;
                     }
                 }
