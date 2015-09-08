@@ -67,6 +67,10 @@
                     outline: none;
                 }
 
+                &.is-open {
+                    border-bottom: 1px solid $shadow-l1;
+                }
+
                 .chapter-menu {
                     padding: 0 14px;
                     overflow: hidden;
@@ -148,10 +152,6 @@
                             padding-bottom: ($baseline/2);
                         }
                     }
-                }
-
-                &.is-open {
-                    border-bottom: 1px solid $shadow-l1;
                 }
             }
         }

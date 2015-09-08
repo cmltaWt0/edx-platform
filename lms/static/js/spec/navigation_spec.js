@@ -41,11 +41,9 @@ define(['jquery', 'js/utils/navigation'], function($) {
                 it('ensures new section is opened and previous section is closed', function() {
                     button:eq(1).click();
 
-                    console.log(chapterContent:eq(0), chapterContent:eq(1));
                     expect(chapterContent:eq(0)).not.toHaveClass('is-open');
                     expect(chapterContent:eq(1)).toHaveClass('is-open');
 
-                    console.log(button:eq(0), button:eq(1));
                     expect(button:eq(0)).not.toHaveClass('is-open');
                     expect(button:eq(1)).toHaveClass('is-open');
 
