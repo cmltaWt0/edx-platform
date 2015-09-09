@@ -18,7 +18,7 @@ from courseware.courses import get_course_with_access
 from discussion_api.forms import CommentActionsForm, ThreadActionsForm
 from discussion_api.pagination import get_paginated_data
 from discussion_api.permissions import (
-    has_permission,
+    can_delete,
     get_editable_fields,
     get_initializable_comment_fields,
     get_initializable_thread_fields)
@@ -730,7 +730,7 @@ def delete_thread(request, thread_id):
 
     """
     cc_thread, context = _get_thread_and_context(request, thread_id)
-    if has_permission(cc_thread, context):
+    if can_delete(cc_thread, context):
         cc_thread.delete()
         thread_deleted.send(sender=None, user=request.user, post=cc_thread)
     else:
@@ -754,7 +754,7 @@ def delete_comment(request, comment_id):
 
     """
     cc_comment, context = _get_comment_and_context(request, comment_id)
-    if has_permission(cc_comment, context):
+    if can_delete(cc_comment, context):
         cc_comment.delete()
         comment_deleted.send(sender=None, user=request.user, post=cc_comment)
     else:

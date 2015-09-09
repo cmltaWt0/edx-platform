@@ -2810,6 +2810,7 @@ class RetrieveThreadTest(
         self.thread_author = UserFactory.create()
         self.register_get_user_response(self.thread_author)
         self.request = RequestFactory().get("/test_path")
+        self.request.user = self.thread_author
         self.thread_id = "test_thread"
         CourseEnrollmentFactory.create(user=self.thread_author, course_id=self.course.id)
 
@@ -2864,13 +2865,11 @@ class RetrieveThreadTest(
             "type": "discussion"
         }
         self.register_thread()
-        self.request.user = self.thread_author
         self.assertEqual(get_thread(self.request, self.thread_id), expected_response_data)
         self.assertEqual(httpretty.last_request().method, "GET")
 
     def test_thread_id_not_found(self):
         self.register_get_thread_error_response("missing_thread", 404)
-        self.request.user = self.thread_author
         with self.assertRaises(Http404):
             get_thread(self.request, "missing_thread")
 
@@ -2939,7 +2938,6 @@ class RetrieveThreadTest(
         cohort = CohortFactory.create(course_id=cohort_course.id, users=[self.thread_author])
         role = Role.objects.create(name=role_name, course_id=cohort_course.id)
         role.users = [self.thread_author]
-        self.request.user = self.thread_author
         self.register_thread({
             "course_id": unicode(cohort_course.id),
             "group_id": (
