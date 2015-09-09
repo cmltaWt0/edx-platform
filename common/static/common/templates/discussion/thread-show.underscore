@@ -1,7 +1,7 @@
 <div class="discussion-post">
     <header class="wrapper-post-header">
         <div class="author-image level-post">
-            <img class="image-frame" src="https://d37djvu3ytnwxt.cloudfront.net/static/images/edx-theme/default-profile_120.41d2f8cbbbbd.png" alt="Profile image for post author">
+            <img class="image-frame" src="https://d1kekzok76m982.cloudfront.net/prod/5d0da5229e4c83894a51e04a41e06cd0_120.jpg?v=1441780917" alt="Profile image for post author">
         </div>
         <div class="post-header-content">
             <h1 class="post-title"><%- title %></h1>

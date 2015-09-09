@@ -25,8 +25,8 @@ body.discussion, .discussion-module {
 
     .post-header-content {
       display: inline-block;
-      width: calc(flex-grid(9,12) - $post-image-dimension);
-      // width: flex-grid(9,12);
+      // width: calc(flex-grid(9,12) - $post-image-dimension);
+      width: flex-grid(8,12); 
     }
 
     .post-header-actions {
@@ -44,8 +44,8 @@ body.discussion, .discussion-module {
     .response-header-content {
       display: inline-block;
       vertical-align: top;
-      width: calc((flex-grid(11,12)) - $response-image-dimension);
-      // width: flex-grid(11,12);
+      // width: calc((flex-grid(11,12)) - $response-image-dimension);
+      width: flex-grid(10,12);
     }
 
     .response-header-actions {
@@ -62,8 +62,8 @@ body.discussion, .discussion-module {
     .response-body {
       display: inline-block;
       margin-bottom: ($baseline/2);
-      width: calc((flex-grid(11,12)) - $comment-image-dimension);
-      //width: flex-grid(10,12);
+      //width: calc((flex-grid(11,12)) - $comment-image-dimension);
+      width: flex-grid(9,12);
       font-size: 13px;
 
       p + p {
@@ -72,6 +72,7 @@ body.discussion, .discussion-module {
     }
 
     .comment-actions-list {
+      @include float(right);
       display: inline-block;
       width: flex-grid(2,12);
       vertical-align: top;
@@ -100,7 +101,6 @@ body.discussion {
       @include margin-right($baseline/2);
       display: inline-block;
       background-color: $gray-l4;
-      border-radius: 3px;
       vertical-align: top; 
 
       // CASE: post image
@@ -119,6 +119,10 @@ body.discussion {
       &.level-comment {
         height: $comment-image-dimension;
         width: $comment-image-dimension;
+      }
+
+      img {
+        border-radius: 3px;
       }
     }
 
