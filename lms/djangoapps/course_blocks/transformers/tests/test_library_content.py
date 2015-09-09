@@ -119,7 +119,6 @@ class ContentLibraryTransformerTestCase(CourseStructureTestCase):
 
         raw_block_structure = get_course_blocks(
             self.user,
-            self.course.id,
             self.course.location,
             transformers={}
         )
@@ -128,7 +127,6 @@ class ContentLibraryTransformerTestCase(CourseStructureTestCase):
         clear_course_from_cache(self.course.id)
         trans_block_structure = get_course_blocks(
             self.user,
-            self.course.id,
             self.course.location,
             transformers={self.transformer}
         )
@@ -146,7 +144,6 @@ class ContentLibraryTransformerTestCase(CourseStructureTestCase):
             clear_course_from_cache(self.course.id)
             trans_block_structure = get_course_blocks(
                 self.user,
-                self.course.id,
                 self.course.location,
                 transformers={self.transformer}
             )

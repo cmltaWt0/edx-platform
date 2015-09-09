@@ -148,7 +148,6 @@ class SplitTestTransformerTestCase(CourseStructureTestCase):
 
         raw_block_structure = get_course_blocks(
             self.user,
-            self.course.id,
             self.course.location,
             transformers={}
         )
@@ -157,7 +156,6 @@ class SplitTestTransformerTestCase(CourseStructureTestCase):
         clear_course_from_cache(self.course.id)
         trans_block_structure = get_course_blocks(
             self.user,
-            self.course.id,
             self.course.location,
             transformers={self.transformation}
         )
@@ -179,7 +177,6 @@ class SplitTestTransformerTestCase(CourseStructureTestCase):
 
         raw_block_structure = get_course_blocks(
             self.user,
-            self.course.id,
             self.course.location,
             transformers={}
         )
@@ -188,7 +185,6 @@ class SplitTestTransformerTestCase(CourseStructureTestCase):
         clear_course_from_cache(self.course.id)
         trans_block_structure = get_course_blocks(
             self.user,
-            self.course.id,
             self.course.location,
             transformers={self.transformation}
         )

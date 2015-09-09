@@ -105,7 +105,6 @@ class RandomizeTransformerTestCase(CourseStructureTestCase):
 
         raw_block_structure = get_course_blocks(
             self.user,
-            self.course.id,
             self.course.location,
             transformers={}
         )
@@ -114,7 +113,6 @@ class RandomizeTransformerTestCase(CourseStructureTestCase):
         clear_course_from_cache(self.course.id)
         trans_block_structure = get_course_blocks(
             self.user,
-            self.course.id,
             self.course.location,
             transformers={self.transformer}
         )
@@ -132,7 +130,6 @@ class RandomizeTransformerTestCase(CourseStructureTestCase):
             clear_course_from_cache(self.course.id)
             trans_block_structure = get_course_blocks(
                 self.user,
-                self.course.id,
                 self.course.location,
                 transformers={self.transformer}
             )
