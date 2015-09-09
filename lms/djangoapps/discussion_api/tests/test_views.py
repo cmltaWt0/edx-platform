@@ -583,7 +583,6 @@ class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTest
 class ThreadViewSetDeleteTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
     """Tests for ThreadViewSet delete"""
     def setUp(self):
-        #from nose.tools import set_trace;set_trace()
         super(ThreadViewSetDeleteTest, self).setUp()
         self.url = reverse("thread-detail", kwargs={"thread_id": "test_thread"})
         self.thread_id = "test_thread"

@@ -2904,10 +2904,57 @@ class RetrieveThreadTest(
             "id": "test_thread",
             "type": "discussion"
         }
-        self.non_author_user = UserFactory.create()  # pylint: disable=attribute-defined-outside-init
-        self.register_get_user_response(self.non_author_user)
-        CourseEnrollmentFactory.create(user=self.non_author_user, course_id=self.course.id)
+        non_author_user = UserFactory.create()  # pylint: disable=attribute-defined-outside-init
+        self.register_get_user_response(non_author_user)
+        CourseEnrollmentFactory.create(user=non_author_user, course_id=self.course.id)
         self.register_thread()
-        self.request.user = self.non_author_user
+        self.request.user = non_author_user
         self.assertEqual(get_thread(self.request, self.thread_id), expected_response_data)
         self.assertEqual(httpretty.last_request().method, "GET")
+
+    @ddt.data(
+        *itertools.product(
+            [
+                FORUM_ROLE_ADMINISTRATOR,
+                FORUM_ROLE_MODERATOR,
+                FORUM_ROLE_COMMUNITY_TA,
+                FORUM_ROLE_STUDENT,
+            ],
+            [True, False],
+            ["no_group", "match_group", "different_group"],
+        )
+    )
+    @ddt.unpack
+    def test_group_access(self, role_name, course_is_cohorted, thread_group_state):
+        """
+        Tests group access for retrieving a thread
+
+        All privileged roles are able to retrieve a thread. A student role can
+        only retrieve a thread if,
+        the student role is the author and the thread is not in a cohort,
+        the student role is the author and the thread is in the author's cohort.
+        """
+        cohort_course = CourseFactory.create(cohort_config={"cohorted": course_is_cohorted})
+        CourseEnrollmentFactory.create(user=self.thread_author, course_id=cohort_course.id)
+        cohort = CohortFactory.create(course_id=cohort_course.id, users=[self.thread_author])
+        role = Role.objects.create(name=role_name, course_id=cohort_course.id)
+        role.users = [self.thread_author]
+        self.request.user = self.thread_author
+        self.register_thread({
+            "course_id": unicode(cohort_course.id),
+            "group_id": (
+                None if thread_group_state == "no_group" else
+                cohort.id if thread_group_state == "match_group" else
+                cohort.id + 1
+            ),
+        })
+        expected_error = (
+            role_name == FORUM_ROLE_STUDENT and
+            course_is_cohorted and
+            thread_group_state == "different_group"
+        )
+        try:
+            get_thread(self.request, self.thread_id)
+            self.assertFalse(expected_error)
+        except Http404:
+            self.assertTrue(expected_error)
