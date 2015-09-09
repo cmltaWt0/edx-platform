@@ -23,8 +23,8 @@ django-mako==0.1.5pre
 django-model-utils==2.3.1
 django-mptt==0.7.4
 django-openid-auth==0.4
-django-sekizai==0.6.1
-django-ses==0.4.1
+django-sekizai==0.8.2
+django-ses==0.7.0
 django-simple-history==1.6.3
 django-storages==1.1.5
 django-threaded-multihost==1.4-1
@@ -130,7 +130,7 @@ django_nose==1.4.1
 factory_boy==2.2.1
 flaky==2.0.3
 freezegun==0.1.11
-mock-django==0.6.6
+mock-django==0.6.9
 mock==1.0.1
 moto==0.3.1
 nose-exclude
