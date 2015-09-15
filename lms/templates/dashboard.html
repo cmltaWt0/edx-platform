@@ -8,6 +8,9 @@ from third_party_auth import pipeline
 from microsite_configuration import microsite
 from django.core.urlresolvers import reverse
 import json
+from courseware.courses import course_image_url, get_course_about_section
+from django.conf import settings
+from edxmako.shortcuts import marketing_link
 %>
 
 <%
@@ -37,13 +40,50 @@ import json
 <%block name="js_extra">
   <%static:js group='dashboard'/>
   <script type="text/javascript">
-    $(document).ready(function() {
+    $(document).ready(function() {     
+        ## making the conditional around this entire JS block for sanity
+        $('#class_enroll_form').on('ajax:complete', function(event, xhr) {
+          if(xhr.status == 200) {
+            location.href = "${reverse('dashboard')}";
+          } else if (xhr.status == 403) {
+            $('#register_error').html("he currently logged-in user account does not have permission to enroll in this course.").css("display", "block");
+          } else if (xhr.status == 400) { //This means the user did not have permission
+            $('#register_error').html("he currently logged-in user account does not have permission to enroll in this course.").css("display", "block");
+          } else {
+            $('#register_error').html(
+              (xhr.responseText ? xhr.responseText : "${_("An error occurred. Please try again later.")}")
+            ).css("display", "block");
+          }
+        });       
+      }
       edx.dashboard.legacy.init({
         dashboard: "${reverse('dashboard')}",
         signInUser: "${reverse('signin_user')}",
         changeEmailSettings: "${reverse('change_email_settings')}"
       });
+      if(localStorage["registerURLs"] != undefined){
+        var registerURL = localStorage["registerURLs"].split(",")[0];
+        var courseId = registerURL.substring(20, registerURL.indexOf("&"))
+        if(localStorage["registerURLs"].split(",").length == 1){
+          localStorage.removeItem("registerURLs");
+        }
+        else{
+          localStorage["registerURLs"] = localStorage["registerURLs"].substring(registerURL.length+1, localStorage["registerURLs"].length)
+        }
+        $("input[name='course_id'", $("#class_enroll_form")).val(courseId);
+        $("input[name='enrollment_action'", $("#class_enroll_form")).val("enroll")
+        $("#class_enroll_form").submit();
+      }
     });
+    /*$(document).ready(function(){
+      var len=$(".course-item").length;
+      for(i=0;i<len;i++){
+        for(j=0;j<i;j++){
+          if($("a", $($(".course-item")[i])).first().attr("href").split("/")[4] <= $("a", $($(".course-item")[j])).first().attr("href").split("/")[4])
+            $($(".course-item")[i]).insertBefore($(".course-item")[j])
+        }
+      }
+    });*/
   </script>
   % if settings.FEATURES.get('ENABLE_DASHBOARD_SEARCH'):
     <%static:require_module module_name="js/search/dashboard/dashboard_search_factory" class_name="DashboardSearchFactory">
@@ -155,7 +195,6 @@ import json
       <p><a class="btn-find-courses" href="${marketing_link('COURSES')}">${_("Find New Courses")}</a></p>
     </div>
   % endif
-
   <section class="profile-sidebar" id="profile-sidebar" role="region" aria-label="Account Status Info">
     <header class="profile">
       <h2 class="account-status-title sr">${_("Account Status Info")}: </h2>
@@ -237,6 +276,17 @@ import json
       <input name="enrollment_action" type="hidden" value="unenroll" />
       <div class="submit">
         <input name="submit" type="submit" value="${_("Unenroll")}" />
+      </div>
+    </form>
+  </div>
+  <div style="display: none;">
+    <form id="class_enroll_form" method="post" data-remote="true" action="${reverse('change_enrollment')}">
+      <fieldset class="enroll_fieldset">
+        <input name="course_id" type="hidden"/>
+        <input name="enrollment_action" type="hidden"/>
+      </fieldset>
+      <div class="submit">
+        <input name="submit" type="submit" value="enroll">
       </div>
     </form>
   </div>

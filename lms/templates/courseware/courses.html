@@ -60,6 +60,17 @@
         </li>
         %endfor
       </ul>
+      <script type="text/javascript">
+      $(document).ready(function(){
+	var len=$(".courses-listing-item").length;
+        for(i=0;i<len;i++){
+          for(j=0;j<i;j++){
+            if($("a", $($(".courses-listing-item")[i])).first().attr("href").split("/")[4] <= $("a", $($(".courses-listing-item")[j])).first().attr("href").split("/")[4])
+              $($(".courses-listing-item")[i]).insertBefore($(".courses-listing-item")[j])
+          }
+        }
+      });
+      </script>
     </div>
 
 

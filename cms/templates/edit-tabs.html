@@ -83,9 +83,15 @@
                           <h3 class="title-sub">${_(tab.name)}</h3>
                             <ul class="course-nav-item-children">
                             % for item in tab.items(context_course):
-                              <li class="course-nav-item-child title">
-                                ${_(item.name)}
-                              </li>
+                              % if tab.name <> 'Wiki' & tab.name <> 'Discussion':
+                                <li class="course-nav-item-child title">
+                                  ${_(item.name)}
+                                </li>
+                              % else
+                                <li class="course-nav-item-child title">
+                                  ${_("Remove")}
+                                </li>
+                              % endif
                             % endfor
                             </ul>
 

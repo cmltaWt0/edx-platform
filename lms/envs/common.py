@@ -2139,11 +2139,11 @@ XDOMAIN_PROXY_CACHE_TIMEOUT = 60 * 15
 # - 'hidden': to not display the field
 
 REGISTRATION_EXTRA_FIELDS = {
-    'level_of_education': 'optional',
-    'gender': 'optional',
-    'year_of_birth': 'optional',
-    'mailing_address': 'optional',
-    'goals': 'optional',
+    'level_of_education': 'hidden',
+    'gender': 'hidden',
+    'year_of_birth': 'hidden',
+    'mailing_address': 'hidden',
+    'goals': 'hidden',
     'honor_code': 'required',
     'terms_of_service': 'hidden',
     'city': 'hidden',

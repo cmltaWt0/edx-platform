@@ -76,7 +76,8 @@ from edxmako.shortcuts import marketing_link
       if(xhr.status == 200) {
         location.href = "${reverse('dashboard')}";
       } else if (xhr.status == 403) {
-        location.href = "${reverse('course-specific-register', args=[course.id.to_deprecated_string()])}?course_id=${course.id | u}&enrollment_action=enroll";
+        localStorage[registerURLs] = "${reverse('register_user')}?course_id=${course.id.to_deprecated_string()}&enrollment_action=enroll";
+        location.href = "/auth/login/ping-one/?auth_entry=register";
       } else if (xhr.status == 400) { //This means the user did not have permission
         $('#register_error').html("${perms_error}").css("display", "block");
       } else {
@@ -231,12 +232,13 @@ from edxmako.shortcuts import marketing_link
             ##       or something allowing themes to do whatever they
             ##       want here (and on this whole page, really).
             % if self.stanford_theme_enabled():
-              <a href="http://twitter.com/intent/tweet?text=I+just+registered+for+${course.number}+${get_course_about_section(course, 'title')}!+(http://class.stanford.edu)" class="share">
+              <!--a href="http://twitter.com/intent/tweet?text=I+just+registered+for+${course.number}+${get_course_about_section(course, 'title')}!+(http://class.stanford.edu)" class="share">
                 <i class="icon fa fa-twitter"></i><span class="sr">${_("Tweet that you've registered for this course")}</span>
-              </a>
-              <a href="mailto:?subject=Take%20a%20course%20at%20Stanford%20online!&body=I%20just%20registered%20for%20${course.number}%20${get_course_about_section(course, 'title')}+(http://class.stanford.edu)" class="share">
+              </a-->
+              <a href="mailto:?subject=Take%20a%20course%20at%20appliedx!&body=I%20just%20registered%20for%20${course.number}%20${get_course_about_section(course, 'title')}+(http://${settings.ENV_TOKENS['LMS_BASE']})" class="share">
                 <i class="icon fa fa-envelope"></i><span class="sr">${_("Email someone to say you've registered for this course")}</span>
               </a>
+ 	      
             % else:
               <%
                 site_domain = microsite.get_value('site_domain', settings.SITE_NAME)

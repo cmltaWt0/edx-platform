@@ -1646,7 +1646,7 @@ def create_account_with_params(request, params):
             user.email == running_pipeline['kwargs'].get('details', {}).get('email')
         )
     )
-    if send_email:
+    if send_email and False:
         context = {
             'name': profile.name,
             'key': registration.activation_key,
@@ -1680,6 +1680,8 @@ def create_account_with_params(request, params):
     # the activation link from the email.
     new_user = authenticate(username=user.username, password=params['password'])
     login(request, new_user)
+    new_user.is_active = True
+    new_user.save()
     request.session.set_expiry(0)
 
     # TODO: there is no error checking here to see that the user actually logged in successfully,

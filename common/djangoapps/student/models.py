@@ -1259,7 +1259,8 @@ class CourseEnrollment(models.Model):
 
     @classmethod
     def enrollments_for_user(cls, user):
-        return CourseEnrollment.objects.filter(user=user, is_active=1)
+        #return CourseEnrollment.objects.filter(user=user, is_active=1)
+   	return sorted(CourseEnrollment.objects.filter(user=user, is_active=1), key=lambda ce: ce.course_id)
 
     def is_paid_course(self):
         """
