@@ -44,7 +44,7 @@ from student.helpers import (
   % endif
 
 <article class="course${mode_class}">
-  <% course_target = reverse('info', args=[unicode(course_overview.id)]) %>
+  <% course_target = reverse('courseware', args=[unicode(course_overview.id)])%>
   <section class="details">
     <div class="wrapper-course-image" aria-hidden="true">
       % if show_courseware_link:
@@ -87,7 +87,7 @@ from student.helpers import (
         <div class="course-info">
           <span class="info-university">${get_course_university_about_section(course_overview)} - </span>
           <span class="info-course-id">${course_overview.display_number_with_default | h}</span>
-          <span class="info-date-block" data-tooltip="Hi">
+          <span class="info-date-block" data-tooltip="Hi" style="display:none">
           % if course_overview.has_ended():
             ${_("Ended - {end_date}").format(end_date=course_overview.end_datetime_text("SHORT_DATE"))}
           % elif course_overview.has_started():

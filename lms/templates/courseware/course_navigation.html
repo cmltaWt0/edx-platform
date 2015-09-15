@@ -91,6 +91,7 @@ include_proctoring = settings.FEATURES.get('ENABLE_PROCTORED_EXAMS', False) and 
             tab_image = notification_image_for_tab(tab, user, course)
         %>
           <li>
+	% if tab.name != "Wiki" and tab.name != "Discussion":
              <a href="${tab.link_func(course, reverse) | h}" class="${url_class(tab_is_active)}">
                  ${_(tab.name) | h}
                  % if tab_is_active:
@@ -102,6 +103,7 @@ include_proctoring = settings.FEATURES.get('ENABLE_PROCTORED_EXAMS', False) and 
                    <img src="${tab_image}" alt="${_('needs attention')}" />
                  %endif
              </a>
+        % endif
           </li>
       % endfor
       <%block name="extratabs" />
