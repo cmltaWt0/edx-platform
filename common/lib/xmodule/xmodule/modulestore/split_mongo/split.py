@@ -1020,6 +1020,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             raise InsufficientSpecificationError(usage_key)
         try:
             course_structure = self._lookup_course(usage_key.course_key).structure
+	    #raise NotImplementedError(course_structure)
         except ItemNotFoundError:
             # this error only occurs if the course does not exist
             return False

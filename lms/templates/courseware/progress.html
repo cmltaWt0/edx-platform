@@ -48,12 +48,30 @@ from django.utils.http import urlquote_plus
         <h1 class="progress-certificates-title">${_("Course Progress for Student '{username}' ({email})").format(username=student.username, email=student.email)}</h1>
       </header>
 
-      %if show_generate_cert_btn:
-      <div class="wrapper-msg wrapper-auto-cert">
+      %if show_generate_cert_btn | True:
+      <div class="wrapper-auto-cert"><!--removed class wrapper-msg -->
         <div id="errors-info" class="errors-info"></div>
         %if passed:
-        <div class="auto-cert-message" id="course-success">
-          <div class="has-actions">
+        <div id="course-success" style="display:none;padding-top:20px;"><!--removed class auto-cert-message -->
+          <%
+            SUCCESS_BUTTON_URL = _("http://agu.mis.amat.com/integ/finish.php?C={course_id}").format(course_id=course.id)
+          %>
+            <a style="display:none" href="${SUCCESS_BUTTON_URL}" target="_blank" x1="${course.cert_name_long}">
+              ${_("Get credit for the course")}
+            </a>
+            <a class="btn" href="${course.cert_name_long}" target="_blank" title="${_('View certificate in a new browser window or tab.')}">
+                ${_("Get credit for the course")}
+            </a>
+
+            <script type="text/javascript">
+              var href = $("#course-success a").attr("href");
+              var crs_id = (href.split("?")[1].split("+")[1] + href.split("?")[1].split("+")[2]).toUpperCase();
+              href = href.split("?")[0] + "?C=EDX" + crs_id
+              $("#course-success a").first().attr("href", href);
+              $("#course-success").show();
+             // $("#course-success a").click(function(){window.open("https://survey.amat.com/survey/s?s=34513&opdata_name1=" + crs_id)});
+            </script>
+          <!--div class="has-actions">
               <% post_url = reverse('generate_user_cert', args=[unicode(course.id)]) %>
               % if is_downloadable:
               <div class="msg-content">
@@ -89,7 +107,7 @@ from django.utils.http import urlquote_plus
                 <button class="btn generate_certs" data-endpoint="${post_url}" id="btn_generate_cert">${_('Request Certificate')}</button>
               </div>
               %endif
-          </div>
+          </div-->
         </div>
         %endif
       </div>
@@ -224,4 +242,3 @@ from django.utils.http import urlquote_plus
     </div>
   </div>
 </div>
-

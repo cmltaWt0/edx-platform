@@ -119,6 +119,9 @@ ${page_title_breadcrumbs(course_name())}
           $(".sequence-nav-buttons").hide();
           $(".sequence-list-wrapper").hide();
         }
+        $(".button-next").click(function(){document.location.reload()});
+        $(".button-previous").click(function(){document.location.reload()});
+        $(".sequence-list-wrapper li").click(function(){document.location.reload()});
       });
   </script>
 

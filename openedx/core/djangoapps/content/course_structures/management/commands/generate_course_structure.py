@@ -35,7 +35,7 @@ class Command(BaseCommand):
 
         log.info('Generating course structures for %d courses.', len(course_keys))
         log.debug('Generating course structure(s) for the following courses: %s', course_keys)
-
+        #raise NotImplementedError(course_keys)
         for course_key in course_keys:
             try:
                 # Run the update task synchronously so that we know when all course structures have been updated.

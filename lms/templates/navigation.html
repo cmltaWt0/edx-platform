@@ -23,7 +23,7 @@ from status.status import get_site_status_msg
 try:
     course_id = course.id
 except:
-    # can't figure out a better way to get at a possibly-defined course var
+    # cant figure out a better way to get at a possibly-defined course var
     course_id = None
 site_status_msg = get_site_status_msg(course_id)
 %>
@@ -78,14 +78,14 @@ site_status_msg = get_site_status_msg(course_id)
     </ol>
     <ol class="user">
       <li class="primary">
-        <a href="${reverse('dashboard')}" class="user-link">
+        <!--a href="${reverse('dashboard')}" class="user-link"-->
           <span class="sr">${_("Dashboard for:")}</span>
           <div>
           ${user.username}
           </div>
-        </a>
+        <!--/a-->
       </li>
-      <li class="primary">
+      <!--li class="primary">
         <a href="#" class="dropdown" aria-haspopup="true" aria-expanded="false"><span class="sr">${_("More options dropdown")}</span><i class="fa fa-sort-desc" aria-hidden="true"></i></a>
         <ul class="dropdown-menu" aria-label="More Options" role="menu">
           <%block name="navigation_dropdown_menu_links" >
@@ -95,7 +95,7 @@ site_status_msg = get_site_status_msg(course_id)
           </%block>
           <li><a href="${reverse('logout')}" role="menuitem">${_("Sign Out")}</a></li>
         </ul>
-      </li>
+      </li-->
     </ol>
       % if should_display_shopping_cart_func() and not microsite.is_request_in_microsite(): # see shoppingcart.context_processor.user_has_cart_context_processor
         <ol class="user">
@@ -107,6 +107,8 @@ site_status_msg = get_site_status_msg(course_id)
         </ol>
       % endif
     % else:
+      <!--script type="text/javascript">if(document.location.href.indexOf("register") != document.location.href.length - "register".length && document.location.href.indexOf("logout") != document.location.href.length - "logout".length && document.location.href.indexOf("login") != document.location.href.length - "login".length) document.location.href = "/auth/login/tpa-saml/?auth_entry=login&next=%2Fdashboard&idp=pingsso"</script-->
+
     <ol class="left nav-global">
       <%block name="navigation_global_links">
         % if microsite.get_value('ENABLE_MKTG_SITE', settings.FEATURES.get('ENABLE_MKTG_SITE', False)):

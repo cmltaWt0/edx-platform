@@ -18,3 +18,9 @@
     </ul>
   </nav>
 </div>
+<script>
+if($($("li.active")[0]).next().length>0)	
+	$($("li.active")[0]).next().find("a")[0].click() 
+else 
+	$($($($("li.active")[0]).parent().parent().next()).find("li")[0]).find("a")[0].click();
+</script>

@@ -253,6 +253,9 @@ from student.helpers import (
                       % endif
                     % endif
                   </li>
+                  <li class="actions-item" id="actions-item-reset-score-${dashboard_index}">
+                        <a href="#reset-score-modal" class="action action-reset-score" rel="leanModal" data-course-id="${course_overview.id | h}" data-course-number="${course_overview.number | h}" data-dashboard-index="${dashboard_index}" data-optout="${unicode(course_overview.id) in course_optouts}">${_('Reset Attempts')}</a>
+                  </li>
                   <li class="actions-item" id="actions-item-email-settings-${dashboard_index}">
                     % if show_email_settings:
                       % if not is_course_blocked:

@@ -45,7 +45,7 @@ from .video_handlers import VideoStudentViewHandlers, VideoStudioViewHandlers
 
 from xmodule.video_module import manage_video_subtitles_save
 from xmodule.mixin import LicenseMixin
-
+from urlparse import urlparse
 # The following import/except block for edxval is temporary measure until
 # edxval is a proper XBlock Runtime Service.
 #
@@ -85,6 +85,10 @@ except ImportError:
 log = logging.getLogger(__name__)
 _ = lambda text: text
 
+def get_ext(filename):
+    # Prevent incorrectly parsing urls like 'http://abc.com/path/video.mp4?xxxx'.
+    path = urlparse(filename).path
+    return path.rpartition('.')[-1]
 
 @XBlock.wants('settings')
 class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, XModule, LicenseMixin):
@@ -183,15 +187,35 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
 
         sorted_languages = OrderedDict(sorted_languages)
         return track_url, transcript_language, sorted_languages
+        
+    def get_signed_url(self, url):        
+        import boto
+        import time
+        
+        s3 = boto.connect_s3()
+        cf = boto.connect_cloudfront()
 
+        key_pair_id = ""
+        priv_key_file = ""
+
+        expires = int(time.time()) + 1500 #5 min
+        # For a downloading (normal http) use the full name
+        http_resource = url
+        # Create the signed URL    
+        dist = cf.get_all_distributions()[0].get_distribution()
+        http_signed_url = dist.create_signed_url(http_resource, key_pair_id, expires, private_key_file=priv_key_file)     
+        return http_signed_url
+        
     def get_html(self):
+        #raise NotImplementedError(self.html5_sources)
         transcript_download_format = self.transcript_download_format if not (self.download_track and self.track) else None
-        sources = filter(None, self.html5_sources)
-
+        # URL signing code start -
+        # sources = filter(None, self.html5_sources)
+        sources = {get_ext(src): self.get_signed_url(src) for src in filter(None, self.html5_sources)}
+        # - end of URL signing code -
         download_video_link = None
         branding_info = None
-        youtube_streams = ""
-
+        youtube_streams = ""        
         # If we have an edx_video_id, we prefer its values over what we store
         # internally for download links (source, html5_sources) and the youtube
         # stream.

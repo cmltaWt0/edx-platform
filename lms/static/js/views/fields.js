@@ -43,7 +43,7 @@
                 'error': gettext('An error occurred. Please try again.'),
                 'validationError': '',
                 'inProgress': gettext('Saving'),
-                'success': gettext('Your changes have been saved.')
+                'success': gettext('Your changes have been saved-.')
             },
 
             initialize: function () {

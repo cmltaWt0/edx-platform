@@ -23,6 +23,7 @@ var DetailsView = ValidatingView.extend({
     },
 
     initialize : function(options) {
+	alert(1);
         options = options || {};
         this.fileAnchorTemplate = _.template('<a href="<%= fullpath %>"> <i class="icon fa fa-file"></i><%= filename %></a>');
         // fill in fields
@@ -31,7 +32,6 @@ var DetailsView = ValidatingView.extend({
         this.$el.find("#course-number").val(this.model.get('course_id'));
         this.$el.find("#course-name").val(this.model.get('run'));
         this.$el.find('.set-date').datepicker({ 'dateFormat': 'm/d/yy' });
-
         // Avoid showing broken image on mistyped/nonexistent image
         this.$el.find('img.course-image').error(function() {
             $(this).hide();
@@ -39,7 +39,7 @@ var DetailsView = ValidatingView.extend({
         this.$el.find('img.course-image').load(function() {
             $(this).show();
         });
-
+	this.$el.find('#course-tags').val(this.model.get('freetags'));  
         this.listenTo(this.model, 'invalid', this.handleValidationError);
         this.listenTo(this.model, 'change', this.showNotificationBar);
         this.selectorToField = _.invert(this.fieldToSelectorMap);
@@ -71,7 +71,6 @@ var DetailsView = ValidatingView.extend({
         this.codeMirrorize(null, $('#course-overview')[0]);
 
         this.$el.find('#' + this.fieldToSelectorMap['short_description']).val(this.model.get('short_description'));
-
         this.$el.find('.current-course-introduction-video iframe').attr('src', this.model.videosourceSample());
         this.$el.find('#' + this.fieldToSelectorMap['intro_video']).val(this.model.get('intro_video') || '');
         if (this.model.has('intro_video')) {
@@ -82,9 +81,10 @@ var DetailsView = ValidatingView.extend({
         this.$el.find('#' + this.fieldToSelectorMap['effort']).val(this.model.get('effort'));
 
         var imageURL = this.model.get('course_image_asset_path');
+ 
         this.$el.find('#course-image-url').val(imageURL);
         this.$el.find('#course-image').attr('src', imageURL);
-
+	this.$el.find('#course-tags').val(this.model.get('freetags'));
         var pre_requisite_courses = this.model.get('pre_requisite_courses');
         pre_requisite_courses = pre_requisite_courses.length > 0 ? pre_requisite_courses : '';
         this.$el.find('#' + this.fieldToSelectorMap['pre_requisite_courses']).val(pre_requisite_courses);
@@ -116,7 +116,8 @@ var DetailsView = ValidatingView.extend({
         'course_image_asset_path': 'course-image-url',
         'pre_requisite_courses': 'pre-requisite-course',
         'entrance_exam_enabled': 'entrance-exam-enabled',
-        'entrance_exam_minimum_score_pct': 'entrance-exam-minimum-score-pct'
+        'entrance_exam_minimum_score_pct': 'entrance-exam-minimum-scoire-pct',
+	'freetags': 'course-tags'
     },
 
     updateTime : function(e) {
@@ -236,6 +237,12 @@ var DetailsView = ValidatingView.extend({
                 }
             }, this), 1000);
             break;
+	case 'course-tags':
+	    var value = $(event.currentTarget).val();
+            value = value == "" ? [] : value.split(",");
+            this.model.set('pre_requisite_courses', value);
+            break;
+
         default: // Everything else is handled by datepickers and CodeMirror.
             break;
         }

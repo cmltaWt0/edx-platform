@@ -709,7 +709,16 @@ class CourseFields(object):
             "Between quotation marks, enter the long name of the course to use on the certificate that students "
             "receive when they complete the course."
         ),
-        display_name=_("Certificate Name (Long)"),
+       # display_name=_("Certificate Name (Long)"),
+        display_name=_("AGU Course Completion"),
+        scope=Scope.settings,
+        default=""
+    )
+    agu_ccl = String(
+        help=_(
+            "Completion URL of the course to get AGU credit."
+        ),
+        display_name=_("AGU Course Completion URL"),
         scope=Scope.settings,
         default=""
     )

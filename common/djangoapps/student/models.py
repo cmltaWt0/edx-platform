@@ -52,7 +52,11 @@ import lms.lib.comment_client as cc
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from util.model_utils import emit_field_changed_events, get_changed_fields_dict
 from util.query import use_read_replica_if_available
-
+#from courseware.models import StudentModule
+#import sys, os
+#sys.path.append('/edx/app/edxapp/edx-platform/lms/djangoapps/courseware/')
+#from models import StudentModule
+from opaque_keys.edx.locator import CourseLocator
 
 UNENROLL_DONE = Signal(providing_args=["course_enrollment", "skip_refund"])
 log = logging.getLogger(__name__)
@@ -1162,6 +1166,42 @@ class CourseEnrollment(models.Model):
         try:
             record = CourseEnrollment.objects.get(user=user, course_id=course_id)
             record.update_enrollment(is_active=False, skip_refund=skip_refund)
+
+        except cls.DoesNotExist:
+            log.error(
+                u"Tried to unenroll student %s from %s but they were not enrolled",
+                user,
+                course_id
+            )
+
+    @classmethod
+    def reset_attempts(cls, user, course_id, skip_refund=False):
+        """
+        Remove the user from a given course. If the relevant `CourseEnrollment`
+        object doesn't exist, we log an error but don't throw an exception.
+
+        `user` is a Django User object. If it hasn't been saved yet (no `.id`
+               attribute), this method will automatically save it before
+               adding an enrollment for it.
+
+        `course_id` is our usual course_id string (e.g. "edX/Test101/2013_Fall)
+
+        `skip_refund` can be set to True to avoid the refund process.
+        """
+        #raise NotImplementedError(course_id)
+        #import sys, os
+        #sys.path.append('/edx/app/edxapp/edx-platform/lms/djangoapps/courseware/')
+        #from models import StudentModule
+
+        try:            
+            for exam in StudentModule.objects.filter(student=user, course_id=course_id):
+                state = json.loads(exam.state)
+                if(state.get("attempts")):
+                    state["attempts"] = 0
+                    exam.state=json.dumps(state)
+                    exam.save()
+            #record = CourseEnrollment.objects.get(user=user, course_id=course_id)
+            #record.update_enrollment(is_active=False, skip_refund=skip_refund)
 
         except cls.DoesNotExist:
             log.error(

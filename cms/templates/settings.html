@@ -272,6 +272,46 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
         </section>
         % endif
 
+  <hr class="divide" />
+            <section class="group-settings marketing">
+              <header>
+                <h2 class="title-2">${_("Searching your course")}</h2>
+                <span class="tip">${_("Making your course searchable with custom attributes")}</span>
+              </header>
+              <ol class="list-input">
+	        <li class="field">
+                        <input type="checkbox" data-filter-mapping="verified" value="true" id="appliedx-custom-verified" class="appliedx-custom-settings"/>
+                        <label for="appliedx-custom-verified">Verified </label>
+                </li>
+                <li class="field">
+                        <label for="appliedx-custom-level">Level</label>
+                        <Select id="appliedx-custom-level" class="appliedx-custom-settings" data-filter-mapping="level">
+                                <option>Basic</option>
+                                <option>Intermediate</option>
+                        </select>
+                        <span class="tip tip-stacked">${_("Expertise level expected to undergo this course.")}</span>
+                </li>
+                <li class="field text">
+                        <label for="appliedx-custom-year">Year</label>
+                        <input type="text" id="appliedx-custom-year" class="appliedx-custom-settings" data-filter-mapping="year"/>
+                </li>
+		 <li class="field">
+                        <label for="appliedx-custom-discipline">Discipline</label>
+                        <Select id="appliedx-custom-discipline" class="appliedx-custom-settings" data-filter-mapping="discipline">
+                                <option>Engineering</option>
+                                <option>Management</option>
+                                <option>Sales</option>
+                                <option>Business</option>
+                        </select>
+                        <span class="tip tip-stacked">${_("The subject matter your course deals with.")}</span>
+                </li>
+                <li class="field text">
+                        <label for="appliedx-custom-accelerator">Accelerator</label>
+                        <input type="text" id="appliedx-custom-accelerator" class="appliedx-custom-settings" data-filter-mapping="accelerator"/>
+                </li>
+	      </ol>
+            </section>
+
         <hr class="divide" />
             <section class="group-settings marketing">
               <header>
@@ -279,14 +319,19 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
                 <span class="tip">${_("Information for prospective students")}</span>
               </header>
               <ol class="list-input">
+		<li class="field text" id="field-course-tags">
+                  <label for="course-tags">${_("Course Tags")}</label>
+                  <textarea class="text" id="course-tags"></textarea>
+                  <span class="tip tip-stacked">${_("Appears on the course catalog page when students roll over the course name. Limit to ~150 characters")}</span>
+                </li>
+
                 % if short_description_editable:
-                <li class="field text" id="field-course-short-description">
+                <li style="display:nodne" class="field text" id="field-course-short-description">
                   <label for="course-overview">${_("Course Short Description")}</label>
                   <textarea class="text" id="course-short-description"></textarea>
                   <span class="tip tip-stacked">${_("Appears on the course catalog page when students roll over the course name. Limit to ~150 characters")}</span>
                 </li>
                 % endif
-
                 % if about_page_editable:
                 <li class="field text" id="field-course-overview">
                   <label for="course-overview">${_("Course Overview")}</label>
@@ -452,4 +497,67 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
     </aside>
   </section>
 </div>
+<script type="text/javascript">
+SetFilterValues = function(){
+	var filterMapping = {};
+	try{
+		filterMapping = JSON.parse($("#course-short-description").val())
+	}
+	catch(err){
+	}
+	$(".appliedx-custom-settings").each(function(){
+		control = $(this);
+                value = filterMapping[$(control).attr("data-filter-mapping")];
+                if($(control).prop("tagName").toUpperCase() == "INPUT"){
+                        switch($(control).attr("type").toUpperCase()){
+                                case "TEXT":
+	                                $(control).val(value==undefined?"":value)
+                                        break;
+                                case "CHECKBOX":
+                                        $(control).prop("checked", value==undefined?false:value);
+                                        break;
+                        }
+                }
+                if($(control).prop("tagName").toUpperCase() == "SELECT"){
+                        control = $(this);
+                        $(control).val(value==undefined?"":value);
+                }
+	});
+}
+setTimeout(function(){
+	SetFilterValues();
+	$(".appliedx-custom-settings").change(function(e){
+		var filterMapping = {};
+		$(".appliedx-custom-settings").each(function(){
+			control = $(this);
+			if($(control).prop("tagName").toUpperCase() == "INPUT"){
+				switch($(control).attr("type").toUpperCase()){
+					case "TEXT":
+						filterMapping[$(control).attr("data-filter-mapping")] = $(control).val();
+						break;
+					case "CHECKBOX":
+						filterMapping[$(control).attr("data-filter-mapping")] = $(control).prop("checked");
+						break;
+				}
+			}
+			if($(control).prop("tagName").toUpperCase() == "SELECT"){
+				debugger;
+				control = $(this);
+				filterMapping[$(control).attr("data-filter-mapping")] = $($("option", $(control))[$(control)[0].selectedIndex]).text();
+			}
+		});
+		filterMapping = JSON.stringify(filterMapping)
+		$("#course-short-description").val(filterMapping);
+                $("#course-short-description").change();
+/*		$.ajax({
+			type: "POST",
+			url: document.location.href,
+			data: JSON.stringify({"short_description":filterMapping,"intro_video":$("#course-introduction-video").val()}),
+			success: function(){console.log("s");},
+			error: function(err){conole.log(err)},
+	  		contentType: "application/json"
+		});*/
+	});
+}, 2000);
+</script>
 </%block>

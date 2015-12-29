@@ -5,9 +5,7 @@
         'js/discovery/views/search_form', 'js/discovery/views/courses_listing',
         'js/discovery/views/filter_bar', 'js/discovery/views/refine_sidebar'],
         function(Backbone, SearchState, Filters, SearchForm, CoursesListing, FilterBar, RefineSidebar) {
-
             return function (meanings, searchQuery) {
-
                 var dispatcher = _.extend({}, Backbone.Events);
                 var search = new SearchState();
                 var filters = new Filters();
@@ -75,8 +73,7 @@
                 });
 
                 // kick off search on page refresh
-                form.doSearch(searchQuery);
-
+                // form.doSearch(searchQuery);
                 function removeFilter(type) {
                     form.showLoadingIndicator();
                     filters.remove(type);

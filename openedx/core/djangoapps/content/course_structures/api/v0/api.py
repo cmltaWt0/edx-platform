@@ -70,13 +70,13 @@ def course_structure(course_key, block_types=None):
 
     """
     course = _retrieve_course(course_key)
-
     modified_timestamp = models.CourseStructure.objects.filter(course_id=course_key).values('modified')
     if modified_timestamp.exists():
         cache_key = 'openedx.content.course_structures.api.v0.api.course_structure.{}.{}.{}'.format(
             course_key, modified_timestamp[0]['modified'], '_'.join(block_types or [])
         )
         data = cache.get(cache_key)  # pylint: disable=maybe-no-member
+        #raise NotImplementedError(data)
         if data is not None:
             return data
 

@@ -72,7 +72,7 @@ from collections import namedtuple
 
 from courseware.courses import get_courses, sort_by_announcement, sort_by_start_date  # pylint: disable=import-error
 from courseware.access import has_access
-
+from courseware.models import StudentModule
 from django_comment_common.models import Role
 
 from external_auth.models import ExternalAuthMap
@@ -1018,6 +1018,27 @@ def change_enrollment(request, check_access=True):
             return HttpResponseBadRequest(_("You are not enrolled in this course"))
         CourseEnrollment.unenroll(user, course_id)
         return HttpResponse()
+    elif action == "reset":
+        if not CourseEnrollment.is_enrolled(user, course_id):
+            return HttpResponseBadRequest(_("You are not enrolled in this course"))
+        #try:
+        for exam in StudentModule.objects.filter(student=user, course_id=course_id):
+            state = json.loads(exam.state)
+            #if(state.get("attempts")):
+            resetcount = 0;
+            if(state.get("resetcount")):
+	        resetcount = state["resetcount"]
+            state["attempts"] = 0
+            exam.state='{"resetcount":' + str(resetcount + 1) + '}'#json.dumps(state)
+            exam.save()
+        #except .DoesNotExist:
+         #   log.error(
+          #      u"Tried to unenroll student %s from %s but they were not enrolled",
+           #     user,
+            #    course_id
+           # )
+
+        return HttpResponse("/dashboard")
     else:
         return HttpResponseBadRequest(_("Enrollment action is invalid"))
 
@@ -1073,6 +1094,7 @@ def login_user(request, error=""):  # pylint: disable=too-many-statements,unused
                 content_type="text/plain",
                 status=403
             )
+
 
     else:
 

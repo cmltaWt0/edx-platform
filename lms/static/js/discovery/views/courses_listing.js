@@ -31,10 +31,24 @@ define([
             this.isLoading = false;
         },
 
+        buildTags: function() {
+		
+	},
+
         renderItems: function () {
             var latest = this.model.latest();
             var items = latest.map(function (result) {
-                var item = new CourseCardView({ model: result });
+                //console.log(result)
+		//debugger;
+		//var tags = []
+		//if(result.attributes.content.short_description != undefined){
+		//	tags = JSON.parse(result.attributes.content.short_description)
+			/*for(tag in tags)
+				tags[tag] = tags[tag].trim();*/
+		//}
+		//result.attributes.content["Tags"] = tags;
+	        var item = new CourseCardView({ model: result });
+		console.log(item)
                 return item.render().el;
             }, this);
             this.$list.append(items);

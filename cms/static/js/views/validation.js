@@ -152,6 +152,7 @@ var ValidatingView = BaseView.extend({
 
     saveView: function() {
         var self = this;
+	console.log("whats going on");
         this.model.save(
             {},
             {

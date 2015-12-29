@@ -12,7 +12,9 @@
                 <span class="course-code"><%= content.number %></span>
                 <span class="course-title"><%= content.display_name %></span>
             </h2>
-            <div class="course-date" aria-hidden="true"><%= interpolate(gettext("Starts: %s"), [start]) %></div>
+            <div class="appliedx-custom-search-tags" href="<%- content.short_description %>" >
+            </div>
+	    <div class="course-date" aria-hidden="true"><%= interpolate(gettext("Starts: %s"), [start]) %></div>
         </section>
         <div class="sr">
             <ul>
@@ -22,4 +24,11 @@
             </ul>
         </div>
     </a>
+    <script type="text/javascript">
+        search_tag = function(e){
+                $(".discovery-input").val($(e.target).text());
+                $(".discovery-submit").click();
+                $(".discovery-input").val("");
+        }
+    </script>
 </article>

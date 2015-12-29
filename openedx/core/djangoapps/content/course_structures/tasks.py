@@ -18,6 +18,7 @@ def _generate_course_structure(course_key):
         blocks_stack = [course]
         blocks_dict = {}
         discussions = {}
+	raise NotImplementedError(blocks_stack)
         while blocks_stack:
             curr_block = blocks_stack.pop()
             children = curr_block.get_children() if curr_block.has_children else []

@@ -24,6 +24,10 @@ define([
         },
 
         performSearch: function (searchTerm, otherTerms) {
+
+            console.log(searchTerm);
+	    console.log(otherTerms);
+
             this.reset();
             this.searchTerm = searchTerm;
             if (otherTerms) {

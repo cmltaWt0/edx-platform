@@ -24,6 +24,7 @@ def get_default_time_display(dtime):
         return u""
     if dtime.tzinfo is not None:
         try:
+            #raise NotImplementedError(dtime)
             timezone = u" " + dtime.tzinfo.tzname(dtime)
         except NotImplementedError:
             timezone = dtime.strftime('%z')
