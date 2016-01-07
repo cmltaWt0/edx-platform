@@ -45,7 +45,7 @@ from .video_handlers import VideoStudentViewHandlers, VideoStudioViewHandlers
 
 from xmodule.video_module import manage_video_subtitles_save
 from xmodule.mixin import LicenseMixin
-
+from urlparse import urlparse
 # The following import/except block for edxval is temporary measure until
 # edxval is a proper XBlock Runtime Service.
 #
@@ -84,6 +84,11 @@ except ImportError:
 
 log = logging.getLogger(__name__)
 _ = lambda text: text
+
+def get_ext(filename):
+   	# Prevent incorrectly parsing urls like 'http://abc.com/path/video.mp4?xxxx'.
+    path = urlparse(filename).path
+    return path.rpartition('.')[-1]
 
 
 @XBlock.wants('settings')
@@ -183,11 +188,31 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
 
         sorted_languages = OrderedDict(sorted_languages)
         return track_url, transcript_language, sorted_languages
+        
+    def get_signed_url(self, url):
+        import boto
+        import time        
+        s3 = boto.connect_s3("AKIAIMZPDDYN43K7TNDA", "6qUWkAoTXsPEHdxZ1SFXZUzUMqmlNoeauuG4qbKC")
+        #if not boto.config.get('s3', 'use-sigv4'):
+        #    boto.config.add_section('s3')
+        #    boto.config.set('s3', 'use-sigv4', 'True')
+        #s3 = boto.connect_to_region("us-west-2", "AKIAIMZPDDYN43K7TNDA", "6qUWkAoTXsPEHdxZ1SFXZUzUMqmlNoeauuG4qbKC", "s3.us-west-2.amazonaws.com")
+        cf = boto.connect_cloudfront("AKIAIMZPDDYN43K7TNDA", "6qUWkAoTXsPEHdxZ1SFXZUzUMqmlNoeauuG4qbKC")
+        key_pair_id = "APKAJKRCKOTGUGXK6D7Q"
+        priv_key_file = "/edx/app/edxapp/aws/pk-APKAJKRCKOTGUGXK6D7Q.pem"
+        expires = int(time.time()) + 45
+        http_resource = url.replace("http://d39hrd3nimo87k.cloudfront.net", "https://d2a8rd6kt4zb64.cloudfront.net")
+        dist = cf.get_all_distributions()[0].get_distribution()
+        http_signed_url = dist.create_signed_url(http_resource, key_pair_id, expires, private_key_file=priv_key_file)
+        #if url.find("http://d39hrd3nimo87k.cloudfront.net/") + url.find("http://d2a8rd6kt4zb64.cloudfront.net/") == -2:
+          #return url 
+        return http_signed_url
+
 
     def get_html(self):
         transcript_download_format = self.transcript_download_format if not (self.download_track and self.track) else None
-        sources = filter(None, self.html5_sources)
-
+        #sources = filter(None, self.html5_sources)
+        sources = {get_ext(src): self.get_signed_url(src) for src in filter(None, self.html5_sources)}
         download_video_link = None
         branding_info = None
         youtube_streams = ""
