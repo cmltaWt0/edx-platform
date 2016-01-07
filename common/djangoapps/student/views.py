@@ -72,7 +72,7 @@ from collections import namedtuple
 
 from courseware.courses import get_courses, sort_by_announcement, sort_by_start_date  # pylint: disable=import-error
 from courseware.access import has_access
-
+from courseware.models import StudentModule
 from django_comment_common.models import Role
 
 from external_auth.models import ExternalAuthMap
@@ -1018,6 +1018,18 @@ def change_enrollment(request, check_access=True):
             return HttpResponseBadRequest(_("You are not enrolled in this course"))
         CourseEnrollment.unenroll(user, course_id)
         return HttpResponse()
+    elif action == "reset":
+        if not CourseEnrollment.is_enrolled(user, course_id):
+            return HttpResponseBadRequest(_("You are not enrolled in this course"))
+        for exam in StudentModule.objects.filter(student=user, course_id=course_id):
+            state = json.loads(exam.state)
+            resetcount = 0;
+            if(state.get("resetcount")):
+                resetcount = state["resetcount"]
+            state["attempts"] = 0
+            exam.state='{"resetcount":' + str(resetcount + 1) + '}'#json.dumps(state)
+            exam.save()
+        return HttpResponse("/dashboard")
     else:
         return HttpResponseBadRequest(_("Enrollment action is invalid"))
 
@@ -1513,6 +1525,7 @@ def create_account_with_params(request, params):
     do_external_auth = 'ExternalAuthMap' in request.session
     if do_external_auth:
         eamap = request.session['ExternalAuthMap']
+        #raise NotImplementedError(eamap)
         try:
             validate_email(eamap.external_email)
             params["email"] = eamap.external_email
@@ -1622,8 +1635,8 @@ def create_account_with_params(request, params):
                 }
             }
         )
-
-    create_comments_service_user(user)
+    #raise NotImplementedError(user.id)
+    #create_comments_service_user(user)
 
     # Don't send email if we are:
     #
