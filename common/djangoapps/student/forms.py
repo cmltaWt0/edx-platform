@@ -169,12 +169,13 @@ class AccountCreationForm(forms.Form):
         for field_name, field_value in extra_fields.items():
             if field_name not in self.fields:
                 if field_name == "honor_code":
-                    if field_value == "required":
-                        self.fields[field_name] = TrueField(
-                            error_messages={
-                                "required": _("To enroll, you must follow the honor code.")
-                            }
-                        )
+                    #if field_value == "required":
+                    #    self.fields[field_name] = TrueField(
+                    #        error_messages={
+                    #            "required": _("To enroll, you must follow the honor code.")
+                    #        }
+                    #    )
+                    ixabet = 1
                 else:
                     required = field_value == "required"
                     min_length = 1 if field_name in ("gender", "level_of_education") else 2
