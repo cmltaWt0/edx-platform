@@ -192,14 +192,6 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
     def get_signed_url(self, url):
         import boto
         import time        
-        s3 = boto.connect_s3("AKIAIMZPDDYN43K7TNDA", "6qUWkAoTXsPEHdxZ1SFXZUzUMqmlNoeauuG4qbKC")
-        #if not boto.config.get('s3', 'use-sigv4'):
-        #    boto.config.add_section('s3')
-        #    boto.config.set('s3', 'use-sigv4', 'True')
-        #s3 = boto.connect_to_region("us-west-2", "AKIAIMZPDDYN43K7TNDA", "6qUWkAoTXsPEHdxZ1SFXZUzUMqmlNoeauuG4qbKC", "s3.us-west-2.amazonaws.com")
-        cf = boto.connect_cloudfront("AKIAIMZPDDYN43K7TNDA", "6qUWkAoTXsPEHdxZ1SFXZUzUMqmlNoeauuG4qbKC")
-        key_pair_id = "APKAJKRCKOTGUGXK6D7Q"
-        priv_key_file = "/edx/app/edxapp/aws/pk-APKAJKRCKOTGUGXK6D7Q.pem"
         expires = int(time.time()) + 45
         http_resource = url.replace("http://d39hrd3nimo87k.cloudfront.net", "https://d2a8rd6kt4zb64.cloudfront.net")
         dist = cf.get_all_distributions()[0].get_distribution()
