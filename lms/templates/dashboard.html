@@ -54,7 +54,7 @@ from edxmako.shortcuts import marketing_link
               (xhr.responseText ? xhr.responseText : "${_("An error occurred. Please try again later.")}")
             ).css("display", "block");
           }
-        });       
+        });
       edx.dashboard.legacy.init({
         dashboard: "${reverse('dashboard')}",
         signInUser: "${reverse('signin_user')}",

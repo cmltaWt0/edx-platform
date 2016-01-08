@@ -73,6 +73,7 @@ from collections import namedtuple
 from courseware.courses import get_courses, sort_by_announcement, sort_by_start_date  # pylint: disable=import-error
 from courseware.access import has_access
 from courseware.models import StudentModule
+
 from django_comment_common.models import Role
 
 from external_auth.models import ExternalAuthMap
@@ -1525,7 +1526,6 @@ def create_account_with_params(request, params):
     do_external_auth = 'ExternalAuthMap' in request.session
     if do_external_auth:
         eamap = request.session['ExternalAuthMap']
-        #raise NotImplementedError(eamap)
         try:
             validate_email(eamap.external_email)
             params["email"] = eamap.external_email
@@ -1635,8 +1635,6 @@ def create_account_with_params(request, params):
                 }
             }
         )
-    #raise NotImplementedError(user.id)
-    #create_comments_service_user(user)
 
     # Don't send email if we are:
     #

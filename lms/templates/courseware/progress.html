@@ -69,8 +69,9 @@ from django.utils.http import urlquote_plus
               href = href.split("?")[0] + "?C=EDX" + crs_id
               $("#course-success a").first().attr("href", href);
               $("#course-success").show();
-            </script>
-       </div>
+             // $("#course-success a").click(function(){window.open("https://survey.amat.com/survey/s?s=34513&opdata_name1=" + crs_id)});
+        </script>
+	</div>
         %endif
       </div>
       %endif

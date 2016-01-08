@@ -43,6 +43,11 @@
 }
 </style>
 <script type="text/javascript">setTimeout(function(){$("button.button-saml-pingsso").click()}, 1000);</script>
+
+<div class="section-bkg-wrapper">
+    <div id="login-and-registration-container" class="login-register" />
+</div>
+
 % if settings.FEATURES.get('ENABLE_COMBINED_LOGIN_REGISTRATION'):
     ## This overwrites the "footer" block declared in main.html
     ## with an empty block, effectively hiding the footer
