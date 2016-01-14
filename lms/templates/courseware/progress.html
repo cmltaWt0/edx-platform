@@ -44,7 +44,7 @@ from django.utils.http import urlquote_plus
         </div>
       % endif
 
-      <header class="progress-certificates">
+      <header class="progress-certificates" cid='${ _("http://agu.mis.amat.com/integ/finish.php?C={course_id}").format(course_id=course.id)}'>
         <h1 class="progress-certificates-title">${_("Course Progress for Student '{username}' ({email})").format(username=student.username, email=student.email)}</h1>
       </header>
 
@@ -52,21 +52,22 @@ from django.utils.http import urlquote_plus
       <div class="wrapper-auto-cert"><!--removed class wrapper-msg -->
         <div id="errors-info" class="errors-info"></div>
         %if passed:
-        <div id="course-success" style="display:none;padding-top:20px;"><!--removed class auto-cert-message -->
+        <div id="course-success" style="padding-top:20px;"><!--removed class auto-cert-message -->
           <%
             SUCCESS_BUTTON_URL = _("http://agu.mis.amat.com/integ/finish.php?C={course_id}").format(course_id=course.id)
           %>         
-            <a href="${SUCCESS_BUTTON_URL}" target="_blank">
+            <a href="${course.cert_name_long}"  data-curl="${SUCCESS_BUTTON_URL}" target="_blank">
               ${_("Get credit for the course")}
             </a>
-            <script type="text/javascript">
+            <!--script type="text/javascript">
+            debugger;
               var href = $("#course-success a").attr("href");
-              var crs_id = (href.split("?")[1].split("+")[1] + href.split("?")[1].split("+")[2]).toUpperCase();
+              var crs_id = (href.split("?")[1].split("/")[1] + href.split("?")[1].split("/")[2]).toUpperCase();
               href = href.split("?")[0] + "?C=EDX" + crs_id
               $("#course-success a").attr("href", href);
               $("#course-success").show();
              // $("#course-success a").click(function(){window.open("https://survey.amat.com/survey/s?s=34513&opdata_name1=" + crs_id)});
-            </script>
+            </script-->
           <!--div class="has-actions">
               <% post_url = reverse('generate_user_cert', args=[unicode(course.id)]) %>
               % if is_downloadable:
