@@ -418,7 +418,7 @@ class UserStateCache(object):
 
             pending_updates[cache_key][kvs_key.field_name] = value
 
-        try:
+        try:            
             self._client.set_many(
                 self.user.username,
                 pending_updates
