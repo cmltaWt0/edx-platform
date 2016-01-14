@@ -23,7 +23,7 @@
           <div class="video-player-pre"></div>
           <section class="video-player">
               <div id="${id}"></div>
-              <h3 class="hidden">${_('No playable video sources found.')}</h3>
+              <h3 class="hidden" style="display:none">${_('No playable video sources found.')}</h3>
           </section>
           <div class="video-player-post"></div>
           <section class="video-controls is-hidden">
@@ -112,3 +112,10 @@
   }
 </script>
 % endif;
+<script type="text/javascript">
+console.log("log");
+function resetURL(x){ if(x.indexOf("&") + 1)return x.substr(0, x.lastIndexOf("&")); return x;};
+setTimeout(function(){  
+  $("video").each(function(){$(this).attr("src", resetURL($("source", $(this)).attr("src"))); $(this).parent().removeClass("hidden");$(this).parent().next().addClass("hidden");});
+  }, 2000);
+</script>
