@@ -45,7 +45,7 @@ from .video_handlers import VideoStudentViewHandlers, VideoStudioViewHandlers
 
 from xmodule.video_module import manage_video_subtitles_save
 from xmodule.mixin import LicenseMixin
-
+from urlparse import urlparse
 # The following import/except block for edxval is temporary measure until
 # edxval is a proper XBlock Runtime Service.
 #
@@ -84,6 +84,11 @@ except ImportError:
 
 log = logging.getLogger(__name__)
 _ = lambda text: text
+
+def get_ext(filename):
+    # Prevent incorrectly parsing urls like 'http://abc.com/path/video.mp4?xxxx'.
+    path = urlparse(filename).path
+    return path.rpartition('.')[-1]
 
 
 @XBlock.wants('settings')
@@ -184,10 +189,14 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
         sorted_languages = OrderedDict(sorted_languages)
         return track_url, transcript_language, sorted_languages
 
+    def get_signed_url(self, url):
+        return url
+
+
     def get_html(self):
         transcript_download_format = self.transcript_download_format if not (self.download_track and self.track) else None
-        sources = filter(None, self.html5_sources)
-
+        #sources = filter(None, self.html5_sources)
+        sources = {get_ext(src): self.get_signed_url(src) for src in filter(None, self.html5_sources)}
         download_video_link = None
         branding_info = None
         youtube_streams = ""
