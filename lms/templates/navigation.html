@@ -23,7 +23,7 @@ from status.status import get_site_status_msg
 try:
     course_id = course.id
 except:
-    # can't figure out a better way to get at a possibly-defined course var
+    # cant figure out a better way to get at a possibly-defined course var
     course_id = None
 site_status_msg = get_site_status_msg(course_id)
 %>
@@ -37,6 +37,59 @@ site_status_msg = get_site_status_msg(course_id)
 % endif
 </%block>
 
+<div id="updatedOnCourseReset" style="position:absolute; display:none; z-index: 99;background-color: rgba(166,166,166,0.5); width:100%; height:100%;">
+<div id="xupdatedOnCourseReset" style="position:absolute; z-index: 100;background-color: white;">
+	<style>
+	.appliedx-notification{width: 600px;height: 592px;box-shadow: 3px 3px 12px #ccc;margin: 0px auto;}
+	.appliedx-notification-content{float: right; padding: 8px;font-family: calibri;}
+	.appliedx-notification-header{float: right; width: 100%;background-color: #32f843;font-family: segoe UI;color: white;border-radius: 5px 5px 0px 0px;vertical-align: middle;box-shadow: 0px 0px 0px 2px #b4e391;background: #b4e391; background: -moz-linear-gradient(top,  #b4e391 0%, #61c419 50%, #b4e391 100%); background: -webkit-linear-gradient(top,  #b4e391 0%,#61c419 50%,#b4e391 100%);background: linear-gradient(to bottom,  #b4e391 0%,#61c419 50%,#b4e391 100%);filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#b4e391', endColorstr='#b4e391',GradientType=0 );"}
+	</style>
+	<div class="appliedx-notification-overlay" style="position:absolute; left:0px; top:0px; width:100%; height:100%; display:none;"></div>
+	<div class="appliedx-notification">
+		<div class="appliedx-notification-header">
+			<img src="/static/themes/stanford/images/i.png" style="height: 30px;vertical-align: middle;padding: 0px 3px;">
+			New in appliedx
+		</div>
+		<div class="appliedx-notification-content">
+			<div style="font-size: 20px;padding: 10px 0px;color: #62962e;font-size: 24px;">Resetting courses  is easy now!</div>
+			It was always cumbersome to raise a ticket everytime you could not get suffient passing credits. Finally its time say good bye to tickets, we have enabled self reset on appliedx. That means you can reset the attempts from dashboard yourself. This is how its done -
+				<ul>
+					<li>Click on the appliedx logo <img src="http://acn/sites/gis/ccc/appliedx/Documents/appliedx%20brand%20material/appliedx%20logo.png" height="25" /> at the top left corner, that will take you to your dashboard. Here, find the course you want to reset.</li>
+					<li>Click on the settings<img src="/static/themes/stanford/images/settings.png" style="vertical-align: bottom;">icon at the right side of the course name.</li>
+					<li>From the dropdown select "Reset Attempts"
+						<div><img src="/static/themes/stanford/images/menu.png" style="height: 150px;"></div>
+					</li>
+					<li>Confirm reset on the dialog
+						<div><img src="/static/themes/stanford/images/resetconfirm.png" style="height: 100px;"></div>
+					</li>
+				</ul>
+ 			<div class="appliedx-notification-close-button" style="cursor:pointer; background: #6dd149;color: #f4f4f4;display: inline-block;text-align: center;width: 100px;padding: 10px;font-family: Calibri;font-size: 17px;font-weight: bold;float: right;" onclick="closepopup()">Got it!</div>
+		</div>
+	</div>
+	<script type="text/javascript">
+		setTimeout(function(){
+			$("#xupdatedOnCourseReset").css("left", ($(window).width()-600)/2);
+        	        $("#updatedOnCourseReset").css("height", $(document).height());
+			if(!localStorage["updatedOnCourseReset"]) {
+                        	document.getElementById("updatedOnCourseReset").style.display="block";
+                	}	
+		}, 2000);
+		function closepopup()
+		{
+			document.getElementById("updatedOnCourseReset").style.display="none";
+			localStorage["updatedOnCourseReset"]=false;
+		}
+	</script>
+</div>
+</div>
+<style>
+header.global .user>.primary:last-child>a {
+    height: 32px;
+    padding: 0px 10px;
+    vertical-align: middle;
+    padding-top: 4px;
+}
+</style>
   <header id="global-navigation" class="global ${"slim" if course else ""}" >
     <nav class="nav-wrapper" aria-label="${_('Global')}">
     <h1 class="logo">
@@ -107,6 +160,7 @@ site_status_msg = get_site_status_msg(course_id)
         </ol>
       % endif
     % else:
+    <!--script type="text/javascript">document.location.href="/auth/login/tpa-saml/?auth_entry=login&next=%2Fdashboard&idp=pingsso"</script-->
     <ol class="left nav-global">
       <%block name="navigation_global_links">
         % if microsite.get_value('ENABLE_MKTG_SITE', settings.FEATURES.get('ENABLE_MKTG_SITE', False)):
@@ -154,6 +208,106 @@ site_status_msg = get_site_status_msg(course_id)
     </li>
     </ol>
     % endif
+         <ol class="help authenticated" style="float:right; margin-top:5px; margin-right:50px; cursor:pointer;" >     
+      <li class="nav-global-01">
+        <a href="#" onclick="document.getElementById('customhelp').style.display='block'">Help</a>
+      </li>
+    </ol>
+    <div id="customhelp"  onclick="document.getElementById('customhelp').style.display='none'" >
+	<style>
+	#customhelp{
+		font-family: calibri;
+		position: fixed;
+		z-index: 10000;
+		background-color: #fff;
+		padding: 25px;
+		border: double 3px #ccc;
+		box-shadow: 0px 0px 10px 10px rgba(100,100,100, 0.5);
+		top: 10%;
+		left: 10%;
+		width:80%;
+		display:none;
+		height:500px;
+		overflow:scroll;
+	}
+	#customhelp h1{
+		color: rgb(23,54,93);
+		border-bottom: solid 1px rgb(123,154,193);
+		padding: 5px;
+   		 text-align:left;
+	}
+	#customhelp h2{
+    display:block;
+		font-size: 19px;
+		color: rgb(63,94,133);
+		margin-bottom: 2px;
+		margin-top: 25px;
+		text-transform: capitalize;
+    float:none;
+	}
+	#customhelp p{
+		margin-top: 2px;
+	}
+	#customhelp .emphasize{
+		font-weight: bold;
+    float:left;
+	}
+	 #customhelp .closebutton{
+		float: right;
+		padding: 10px 25px;
+		background-color: #9dd169;
+		color: white;
+	}
+	 #customhelp .closebutton:hover{
+		background-color: #62962e;
+	}
+	 #customhelp img{
+		max-width:100%;
+		padding:10px 0px;
+	}
+	.chtrigger:hover{
+		color:#62962e;
+		border-bottom:dotted 1px #62962e;
+	} 
+   .appliedx-notification-content{ padding: 8px;font-family: calibri;}
+		
+	</style>
+	<h1>Appliedx Help</h1>
+	Welcome to appliedx help, you can raise your issues via following methods -
+	<h2>AGU credit</h2>
+	<div class="emphasize">To get credit for completing the course, please follow these instructions.</div>
+	<ol>
+		<li>1. Review your progress by selecting the Progress menu shown in the top ribbon.</li>
+		<li>2. Press the "Get credit for this course" button if you have a passing grade. If you don't have a passing grade, the button will not appear.
+			<img src="/static/themes/stanford/images/help1.png"/>
+		</li>
+		<li>3. You can look at the questions have not answered yet or reattempt questions which allow multiple attempts to achieve the pass grade
+			<img src="/static/themes/stanford/images/help2.png"/>
+		</li>
+		<li>4. If there is no way you will meet the progress criterion for the course. Please follow the steps below to reset your attempts -
+    
+    <div class="appliedx-notification-content" style="float:none">
+				<ul>
+					<li>A. Open the dashboard and find the course attempts you want to reset</li>
+					<li>B. Click on the settings<img src="/static/themes/stanford/images/settings.png" style="vertical-align: bottom;">icon at the right side of the course name</li>
+					<li>C. From the dropdown select "Reset Attempts"
+						<div><img src="/static/themes/stanford/images/menu.png" style="height: 150px;"></div>
+					</li>
+					<li>D. Confirm reset on the dialog
+						<div><img src="/static/themes/stanford/images/resetconfirm.png" style="height: 100px;"></div>
+					</li>
+				</ul>
+  		 
+    </li>
+	</ol>
+	<h2>Raise a ticket</h2>
+	You can contact help desk if you are having any issue related to login, register or AGU credit. You can also raise a ticket if you are facing problem in accessing the video or course content. Click here to raise a ticket using <a target="_blank" onclick="document.getElementById('customhelp').style.display='none'" href="https://amat.service-now.com/AMAT3/submit_ticket.do?sysparm_url=com.glideapp.servicecatalog_cat_item_view.do%3Fv%3D1%26sysparm_id%3Da9407bce8de239002043d9779f0438dd%26keyword%3DAll%20Summaries%26summary_category%3DAppliedX%26summary%3DAppliedX%20Application&step2=197062b144dc71001e5e858bd9ecf95b">SERVICE NOW </a>
+	<h2>Questions/ Feedback: Use Yammer Feature</h2>
+	You can enter your comments/feedback using yammer feature in appliedx. You can also ask questions to the instructor using yammer. 
+	<h2>Send us a mail</h2>
+	You can also raise a concern or issue by writing to us at <a href="mailto:appliedx_info@amat.com">appliedx_info@amat.com </a>
+	<div class='closebutton' onclick="document.getElementById('customhelp').style.display='none'" >Close Help</div>
+</div>
   </nav>
 </header>
 % if course:
