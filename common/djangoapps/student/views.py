@@ -43,7 +43,7 @@ from social.backends import oauth as social_oauth
 from social.exceptions import AuthException, AuthAlreadyAssociated
 
 from edxmako.shortcuts import render_to_response, render_to_string
-
+from courseware.models import StudentModule
 from course_modes.models import CourseMode
 from shoppingcart.api import order_history
 from student.models import (
@@ -1018,6 +1018,19 @@ def change_enrollment(request, check_access=True):
             return HttpResponseBadRequest(_("You are not enrolled in this course"))
         CourseEnrollment.unenroll(user, course_id)
         return HttpResponse()
+    elif action == "reset":
+        if not CourseEnrollment.is_enrolled(user, course_id):
+            return HttpResponseBadRequest(_("You are not enrolled in this course"))
+        for exam in StudentModule.objects.filter(student=user, course_id=course_id):
+            state = json.loads(exam.state)
+            resetcount = 0;
+            if(state.get("resetcount")):
+                resetcount = state["resetcount"]
+            state["attempts"] = 0
+            exam.state='{"resetcount":' + str(resetcount + 1) + '}'#json.dumps(state)
+            exam.save()
+        return HttpResponse("/dashboard")
+
     else:
         return HttpResponseBadRequest(_("Enrollment action is invalid"))
 
