@@ -115,14 +115,29 @@ ${page_title_breadcrumbs(course_name())}
         });
       });
       $(document).ready(function() {
-        if($($("a[class='disabled']", $(".sequence-nav-buttons").last())).length == 2){
-          $(".sequence-nav-buttons").hide();
-          $(".sequence-list-wrapper").hide();
-        }
-        $(".button-next").click(function(){document.location.reload()});
-        $(".button-previous").click(function(){document.location.reload()});
-        $(".sequence-list-wrapper li").click(function(){document.location.reload()});
+                $(".sequence-list-wrapper li").click(function(){document.location.reload()});
+                        var links = $("#accordion li");
+                        var count = links.length;
+                        for(var i = 0;i < count; i++){
+                        if($(links[i]).hasClass("active")){
+                                if(i < count - 1){
+                                $(".button-next").removeAttr("disabled").removeClass("disabled");
+                                        $(".button-next").attr("href", $("a", $(links[i + 1])).attr("href"));
+                                        $(".button-next").click(function(e){
+                                                document.location.href = $(e.currentTarget).attr("href");
+                                        });
+                                }
+                                if(i > 0){
+                                        $(".button-previous").removeAttr("disabled").removeClass("disabled");
+                                        $(".button-previous").attr("href", $("a", $(links[i - 1])).attr("href"));
+                                        $(".button-previous").click(function(e){
+                                                document.location.href = $(e.currentTarget).attr("href");
+                                        });
+                                }
+                        }
+                }
       });
+
   </script>
 
 % if show_chat:
