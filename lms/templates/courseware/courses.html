@@ -29,6 +29,69 @@
 
 <%block name="pagetitle">${_("Courses")}</%block>
 
+   <style>
+.appliedx-custom-search-tags span {
+    float: left;
+    padding: 5px 11px !important;
+    list-style-type: none;
+    color: white;
+    border-radius: 1px;
+    font-size: 12px;
+    background-color: #aaa;
+    margin: 2px;
+    box-shadow: 2px 2px 3px #ccc;
+    border-radius: 3px;
+}
+.appliedx-custom-search-tags span:hover {
+    color: greenyellow;
+    background-color: #555;
+}
+.appliedx-custom-search-tags {
+    height: 50px;
+    margin-top: -55px;
+    margin-bottom: 5px;
+    padding: 5px;
+}
+.facet-option{ cursor:pointer;}
+.search-facets-lists{ display:none;}
+.courses-listing{ display:none; }
+#discovery-message{ display:none; }
+.verified-label{
+    background-color: rgba(0,88,0,0.6);
+    height: 15px;
+    color: white;
+    padding: 3px 3px 3px 6px;
+    font-size: 10px;
+    font-weight: bold;
+    text-transform: uppercase;
+    border-bottom: solid 1px #090;
+    position: absolute;
+    bottom: -0px;
+    width: 273px;
+}
+.verified-label span{
+    color: white;
+    text-shadow: 1px 1px rgb(116,232,0);
+    font-family: "Wingdings 2";
+    font-size: 41px;
+    z-index: 1;
+    float: left;
+}
+.cover-image{position:relative;height:148px !important;}
+.verified-button{
+    padding: 6px 11px;
+    font-size: 13px;
+    cursor: pointer;
+    border: 2px solid #256a97;
+    background-color: #0078b0;
+    margin: 3px;
+    color: white;
+    font-family: Segoe UI;
+}
+.verified-button:hover{ background: #009ee7;}
+.courses-listing-item{ clear: none !important;}
+    </style>
+
 <section class="find-courses">
   <section class="courses-container">
     % if course_discovery_enabled:
@@ -71,6 +134,184 @@
         }
       });
       </script>
+      <script type="text/javascript">
+        var filters = {};
+        var filterList = {}
+        $(document).ready(function(){
+                setTimeout(function(){
+                        if($("#discovery-message").text() == "")$(".discovery-submit").click()
+                }, 500);
+
+                var len=$(".courses-listing-item").length;
+                for(i=0;i<len;i++){
+                        for(j=0;j<i;j++){
+                                if($("a", $($(".courses-listing-item")[i])).first().attr("href").split("/")[4] <= $("a", $($(".courses-listing-item")[j])).first().attr("href").split("/")[4])
+                                        $($(".courses-listing-item")[i]).insertBefore($(".courses-listing-item")[j])
+                        }
+                }
+                setInterval(function(){
+                        $(".appliedx-custom-search-tags").each(function(){
+                                var searchTagMarkup = "";
+                                var courseCardTags = {};
+                                try{
+                                        courseCardTags = JSON.parse($(this).attr("href"));
+                                }
+                                catch(err){}
+                                if($("span", $(this)).length > 0) return;
+                                for(var tag in courseCardTags){
+                                        if(tag == "verified"){
+                                                if( courseCardTags[tag]){
+                                                        $(".cover-image", $(this).closest(".courses-listing-item")).append("<div class='verified-label'>Verified<span>P</span></div>");
+                                                        $(this).closest(".courses-listing-item").attr("data-"+tag, "Verified");
+                                                }
+                                        }
+                                        else {
+                                                searchTagMarkup += "<span class='appliedx-custom-tag' data-tag-propertyname='" + tag + "'>"+ courseCardTags[tag] +"</span>";
+                                                $(this).closest(".courses-listing-item").attr("data-"+tag, courseCardTags[tag]);
+                                        }
+                                }
+                                $(this).html(searchTagMarkup);
+                        });
+                }, 500);
+                $(".discovery-submit").click(function(){
+                        filters = {};
+                        filterList = {}
+                        $(".search-facets-lists").hide();
+                        $(".courses-listing").hide();
+                        $("#discovery-message").hide();
+                        setTimeout(function(){
+                                var filterList = {}
+                                hasFilterItem = function(list, item, valueIdentifier){
+                                        for(var listItem in list){
+                                                if(listItem == item)
+                                                        return true;
+                                        }
+                                        return false;
+                                }
+                                $(".courses-listing-item").attr("data-visibility", "visible");
+                                var cardCount = createFilters();
+                                $(".search-facets-lists").show();
+                                $(".courses-listing").show();
+                                if(cardCount){
+                                        $("#discovery-message").html("Viewing " + cardCount + " courses");
+                                }
+                                $("#discovery-message").show();
+                        }, 1000);
+                });
+                $(document).on("click", ".course a",  function(e){
+                        if($(e.target).hasClass("appliedx-custom-tag")){
+                                e.preventDefault();
+                                $(".discovery-input").val($(e.target).text());
+                                $(".discovery-submit").click();
+                                $(".discovery-input").val($(e.target).attr("data-tag-propertyname") + ":" + $(e.target).text());
+                        }
+                });
+                $(document).on("click", "#clear-all-filters",  function(e){
+                        console.log("dd");
+                        $(".discovery-submit").click();
+                });
+        });
+        var createFilters = function(){
+                var cardCount = 0;
+                filterList = {};
+                $(".appliedx-custom-search-tags", $(".courses-listing-item[data-visibility]")).each(function(){
+                        var currentFilterAttributes = {};
+                        try{
+                                currentFilterAttributes = JSON.parse($(this).attr("href"));
+                        }
+                        catch(err){}
+                        var currentFilterParam = $(".discovery-input").val().split(":");
+                        if(currentFilterAttributes[currentFilterParam[0]] != currentFilterParam[1]){
+                                $(this).closest(".courses-listing-item").hide();
+                                return;
+                        }
+                        cardCount++;
+                        for(var attribute in currentFilterAttributes){
+                                if(attribute == "verified"){
+                                }
+                                else{
+                                        if(filterList[attribute] == undefined){
+                                                filterList[attribute] = {}
+                                                filterList[attribute][currentFilterAttributes[attribute]] = 1;
+                                        }
+                                        else if(filterList[attribute][currentFilterAttributes[attribute]] == undefined) {
+                                                filterList[attribute][currentFilterAttributes[attribute]] = 1;
+                                        }
+                                        else filterList[attribute][currentFilterAttributes[attribute]]++;
+                                }
+                        }
+                });
+                var filterHTML = "<h3 class='header-facet'>Verified</h3><ul class='facet-list collapse'><li><xbutton class='facet-option discovery-button' data-value='Verified' data-facet='verified'>Show Only Verified</xbutton></li></ul>";
+                for(var filter in filterList){
+                        filterHTML += "<h3 class='header-facet'>" + filter + "</h3>";
+                        filterHTML += "<ul data-facet='" + filter + "' class='facet-list collapse'><li>";
+                        for(var filterItem in filterList[filter]){
+                                filterHTML += "<xbutton data-facet='" + filter + "' data-value='" + filterItem + "'"
+                                filterHTML += " data-text='" + filterItem + "' class='facet-option discovery-button'>"
+                                filterHTML += filterItem + "<span class='count'>" +   filterList[filter][filterItem] + "</span></xbutton>";
+                        }
+                        filterHTML += "</li>  </ul>";
+                }
+                $(".search-facets-lists").html(filterHTML);
+                $("*[data-value]").on("click", function(e){
+                        if($(this).attr("data-type") == "search_query"){
+                                $(".discovery-submit").val("")
+                                $(".discovery-submit").click()
+                                return;
+                        }
+                        var searchKey = $(e.currentTarget).attr("data-facet");
+                        var searchVal = $(e.currentTarget).attr("data-value");
+                        filters[searchKey] = searchVal;
+                        applyFilters();
+                });
+                $(".verified-button").click(function(){
+                        if($(".verified-button").hasClass("clicked")){
+                                $(".verified-button").removeClass("clicked");
+                                $(".verified-button").html("Show All");
+                                $(".verified-label").each(function(){
+                                        $(this).closest(".courses-listing-item").css("clear","none");
+                                });
+                                delete filters["verified"];
+                        }
+                        else{
+                                $(".verified-button").addClass("clicked")
+                                $(".verified-button").html("Show Only Verified");
+                        }
+                });
+                return cardCount;
+        }
+        var applyFilters = function(){
+                $('.filter-item-custom').remove();
+                function createFilterBarItem(key, value){
+                        $("#filter-bar").removeClass("is-collapsed");
+                        $("#filter-bar ul").append("<li class='filter-item-custom'> <button class='facet-option discovery-button'><span class='filter-bar-item'>" + value + "</span><i aria-hidden='true' class='fa fa-times' data-filter='" + key + "'></i></button></li>")
+                }
+                for(filter in filters){
+                        createFilterBarItem(filter, filters[filter])
+                }
+                $(".filter-item-custom").click(function(e){
+                        var target = $(e.target);
+                        if($(target).hasClass("fa-times")) {
+                                delete filters[$(target).attr("data-filter")]
+                                $(e.currentTarget).remove();
+                                applyFilters();
+                        }
+                });
+                $(".courses-listing-item").show();
+                $(".courses-listing-item").attr("data-visibility", "visible");
+                $(".courses-listing-item").each(function(){
+                        var currentCard = $(this);
+                        for(filter in filters){
+                                if($(this).attr("data-"+filter) != filters[filter]) {
+                                       $(currentCard).hide();
+                                       $(currentCard).removeAttr("data-visibility");
+                                }
+                       }
+               });
+               createFilters();
+        }
+      </script>
+
     </div>
 
 
