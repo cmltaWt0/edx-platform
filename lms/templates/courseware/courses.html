@@ -138,10 +138,8 @@
         var filters = {};
         var filterList = {}
         $(document).ready(function(){
-                setTimeout(function(){
-                        if($("#discovery-message").text() == "")$(".discovery-submit").click()
-                }, 500);
-
+		listAll = function(){$(".discovery-submit").length?$(".discovery-submit").click():setTimeout(listAll, 100);}
+		setTimeout(listAll, 100);
                 var len=$(".courses-listing-item").length;
                 for(i=0;i<len;i++){
                         for(j=0;j<i;j++){
