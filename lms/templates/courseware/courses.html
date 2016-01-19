@@ -139,8 +139,8 @@
         var filters = {};
         var filterList = {}
         $(document).ready(function(){
-		listAll = function(){$(".discovery-submit").length?$(".discovery-submit").click():setTimeout(listAll, 100);}
-		setTimeout(listAll, 100);
+		listAll = function(){$(".discovery-submit").length?$(".discovery-submit").click():setTimeout(listAll, 300);}
+		setTimeout(listAll, 300);
                 var len=$(".courses-listing-item").length;
                 for(i=0;i<len;i++){
                         for(j=0;j<i;j++){
@@ -169,7 +169,8 @@
                                                 $(this).closest(".courses-listing-item").attr("data-"+tag, courseCardTags[tag]);
                                         }
                                 }
-                                $(this).html(searchTagMarkup);
+                                $(".search-facets-lists").show();
+
                         });
                 }, 500);
                 $(".discovery-submit").click(function(){
