@@ -169,8 +169,7 @@
                                                 $(this).closest(".courses-listing-item").attr("data-"+tag, courseCardTags[tag]);
                                         }
                                 }
-                                $(".search-facets-lists").show();
-
+                                $(this).html(searchTagMarkup);
                         });
                 }, 500);
                 $(".discovery-submit").click(function(){
