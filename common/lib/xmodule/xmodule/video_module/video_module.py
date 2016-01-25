@@ -190,8 +190,26 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
         return track_url, transcript_language, sorted_languages
 
     def get_signed_url(self, url):
-        return url
-
+        import boto
+        import time
+        import os 
+	from path import Path as path
+	SERVICE_VARIANT = os.environ.get('SERVICE_VARIANT', None)
+	CONFIG_ROOT = path(os.environ.get('CONFIG_ROOT', "/edx/app/edxapp/"))
+	CONFIG_PREFIX = SERVICE_VARIANT + "." if SERVICE_VARIANT else ""
+	with open(CONFIG_ROOT / CONFIG_PREFIX + "env.json") as env_file:
+	    ENV_TOKENS = json.load(env_file)
+	aws_access_key_id = ENV_TOKENS.get("AWS_ACCESS_KEY_ID")
+        aws_secret_access_key = ENV_TOKENS.get("AWS_SECRET_ACCESS_KEY")
+	s3 = boto.connect_s3(aws_access_key_id, aws_secret_access_key)
+        cf = boto.connect_cloudfront(aws_access_key_id, aws_secret_access_key)
+        key_pair_id = ENV_TOKENS.get("SIGNING_KEY_ID")
+        priv_key_file = ENV_TOKENS.get("SIGNING_KEY_FILE")
+        expires = int(time.time()) + 600
+        http_resource = url
+        dist = cf.get_all_distributions()[0].get_distribution()
+        http_signed_url = dist.create_signed_url(http_resource, key_pair_id, expires, private_key_file=priv_key_file)
+        return http_signed_url
 
     def get_html(self):
         transcript_download_format = self.transcript_download_format if not (self.download_track and self.track) else None
