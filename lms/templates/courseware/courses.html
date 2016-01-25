@@ -307,6 +307,10 @@
                                 }
                        }
                });
+	       cardCount = $(".courses-listing-item[data-visibility]").length;
+               if(cardCount){
+                       $("#discovery-message").html("Viewing " + cardCount + " courses");
+               }
                createFilters();
         }
       </script>
