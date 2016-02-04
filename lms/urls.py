@@ -63,6 +63,10 @@ urlpatterns = (
 
     url(r'^i18n/', include('django.conf.urls.i18n')),
 
+    url(r'^hello$', 'util.views.hello'),
+
+    url(r'^sign_url$', 'util.views.sign_cloudfront_url'),
+
     # Feedback Form endpoint
     url(r'^submit_feedback$', 'util.views.submit_feedback'),
 
