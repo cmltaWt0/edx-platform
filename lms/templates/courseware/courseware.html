@@ -115,47 +115,78 @@ ${page_title_breadcrumbs(course_name())}
         });
       });
       $(document).ready(function() {
-                $(".sequence-list-wrapper li").click(function(){document.location.reload()});
-                var links = $("#accordion li");
-                var count = links.length;
-                for(var i = 0;i < count; i++){
-                        if($(links[i]).hasClass("active")){
-                                var lastUnitIndex =  $("#sequence-list li a").length - 1;
-                                var activeUnitIndex = $("#sequence-list li a").index($("#sequence-list li a.active")[0]);
-                                if(i < count - 1){
-	                               	$(".button-next").removeAttr("disabled").removeClass("disabled");
-                                       	$(".button-next").attr("href", $("a", $(links[i + 1])).attr("href"));
-                                        if(activeUnitIndex == lastUnitIndex){
-	                                        $(".button-next").click(function(e){
-	                                                document.location.href = $(e.currentTarget).attr("href");
-	                                        });
-					}
-					else{
-						$(".button-next").click(function(e){ 
-							document.location.reload();
-	                                        });
-					}
-
-                                }
-                                if(i > 0){
-                                        $(".button-previous").removeAttr("disabled").removeClass("disabled");
-                                        $(".button-previous").attr("href", $("a", $(links[i - 1])).attr("href"));
-					if(activeUnitIndex == 0){
-                                        	$(".button-previous").click(function(e){
-	                                               	document.location.href = $(e.currentTarget).attr("href");
-	                                        });
-					}
-                                        else{
-                                                $(".button-previous").click(function(e){
-                                                        document.location.reload();
-                                                });
-                                        }
-
-                                }
-                        }
+		resetButtons();
+		var observer = new WebKitMutationObserver(function (mutations) {
+	 		mutations.forEach(function(mutation){
+				var name = mutation.attributeName,
+    				newValue = mutation.target.getAttribute(name),
+    				oldValue = mutation.oldValue;
+				console.log(name, newValue, oldValue);
+				if(mutation.attributeName == "disabled"){
+					resetButtons();
+				}
+			});
+		});
+		observer.observe($(".button-next")[1], { attributes: true, subtree: false });
+                observer.observe($(".button-previous")[1], { attributes: true, subtree: false });
+		$(".play").click(function(){
+			if(isVideoURLExpired()){
+				reloadVideoURL(player, videoURL.split("?Expires=")[0]);
+			}
+		});
+	});
+	isVideoURLExpired = function(){
+                 var player = $("video", $(".play").closest("article"));
+	         if($(player).length == 0) return false;
+                 var videoURL = $(player).attr("src");
+                 return (parseInt(videoURL.split("?Expires=")[1].split("&")[0])<parseInt(new Date().getTime()/1000 - 10))
+	}
+	reloadVideoURL = function(player, originalURL){
+		$.ajax({
+			url: "/sign_url?url="+originalURL,
+			success: function(result){
+				$(player).attr("src", result.responseText);
+			},
+			error: function(result){
+				$(player).attr("src", result.responseText);
+			}
+		});
+	}
+	resetButtons = function(){
+                if(isVideoURLExpired()){
+			var player = $("video");
+	                reloadVideoURL(player, videoURL.split("?Expires=")[0]);
                 }
-      });
-
+		//$(".sequence-list-wrapper li").click(function(){document.location.reload()});
+		$("#sequence-list li a p").hide();
+                $("#sequence-list li a").attr("title", "");
+                var links = $("#accordion li");
+		var count = links.length;
+		for(var i = 0;i < count; i++){
+			if($(links[i]).hasClass("active")){
+               	                var lastUnitIndex =  $("#sequence-list li a").length - 1;
+                       		var activeUnitIndex = $("#sequence-list li a").index($("#sequence-list li a.active")[0]);
+                                if(i < count - 1){
+       		                       	$(".button-next").removeAttr("disabled").removeClass("disabled");
+                      		       	$(".button-next").attr("href", $("a", $(links[i + 1])).attr("href"));
+                                      	if(activeUnitIndex == lastUnitIndex){
+	                               		$(".button-next").click(function(e){
+	                        		        document.location.href = $(e.currentTarget).attr("href");
+	                               		});
+					}
+		                }
+      		                if(i > 0){
+                                        $(".button-previous").removeAttr("disabled").removeClass("disabled");
+       		                        $(".button-previous").attr("href", $("a", $(links[i - 1])).attr("href"));
+					if(activeUnitIndex == 0){
+                              			$(".button-previous").click(function(e){
+	      	                                       	document.location.href = $(e.currentTarget).attr("href");
+	               	                        });
+					}
+	                        }
+                        }
+	       	}
+      	}
   </script>
 
 % if show_chat:
