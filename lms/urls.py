@@ -37,7 +37,6 @@ urlpatterns = (
     url(r'^logout$', 'student.views.logout_user', name='logout'),
     url(r'^create_account$', 'student.views.create_account', name='create_account'),
     url(r'^activate/(?P<key>[^/]*)$', 'student.views.activate_account', name="activate"),
-
     url(r'^password_reset/$', 'student.views.password_reset', name='password_reset'),
     ## Obsolete Django views for password resets
     ## TODO: Replace with Mako-ized views
@@ -63,9 +62,11 @@ urlpatterns = (
 
     url(r'^i18n/', include('django.conf.urls.i18n')),
 
-    url(r'^hello$', 'util.views.hello'),
-
     url(r'^sign_url$', 'util.views.sign_cloudfront_url'),
+    url(r'^get_search_tags$', 'util.views.get_keywords'),
+    url(r'^delete_search_tag$', 'util.views.rem_keyword'),
+    url(r'^insert_search_tag$', 'util.views.add_keyword'),
+    url(r'^token_auth$', 'util.views.get_auth_token'),
 
     # Feedback Form endpoint
     url(r'^submit_feedback$', 'util.views.submit_feedback'),
