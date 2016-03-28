@@ -44,7 +44,18 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
     </h1>
   </header>
 </div>
-
+	<style>
+	.input-keyword{ vertical-align: middle; width: 400px;}
+	.keywords{padding: 10px 0px;height: 100px;}
+	.input-keyword-suggestions{padding: 0px;margin: 0px; font-size:18px; border: solid 1px #ccc; background: #eee;position:absolute;font-family: calibri; z-index: 1;}
+	.input-keyword-suggestions li{list-style-type:none;padding: 2px 150px 2px 10px !important;cursor:pointer;}
+	.input-keyword-suggestions li:hover, .suggestion-hovered{background-color: #ccc;}
+	.keyword:hover .delete_keyword{visibility:visible;}
+	.keyword { float: left;padding: 5px 16px 5px 12px !important;list-style-type: none;color: white; font-size: 16px;background-color: #aaa; margin: 2px;box-shadow: 2px 2px 3px #ccc;border-radius: 3px;position: relative;font-family: calibri;transition-property: padding, background, color;transition-duration: 0.3s;}
+	.delete_keyword{visibility: hidden;cursor: pointer;font-family: calibri; font-size: 22px; text-align: center; position: absolute; top: -7px; color: #f99; font-weight: bold; padding: 2px;}
+	.keyword:hover {background-color: white; color: #333; box-shadow: 0px 0px 3px #aaa;}
+	.delete_keyword:hover{color:red;}
+	</style>
 <div class="wrapper-content wrapper">
   <section class="content">
     <article class="content-primary" role="main">
@@ -289,15 +300,15 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
                         </select>
                         <span class="tip tip-stacked">${_("Expertise level expected to undergo this course.")}</span>
                 </li>
-                <li class="field text">
+                <!--li class="field text">
                         <label for="appliedx-custom-year">Year</label>
                         <input type="text" id="appliedx-custom-year" class="appliedx-custom-settings" data-filter-mapping="year" pattern=".{4,4}">
                         <span class="tip tip-stacked">${_("Year should be in YYYY format. For example, 2015")}</span>
 
-                </li>
+                </li-->
                  <li class="field">
-                        <label for="appliedx-custom-discipline">Discipline</label>
-                        <select id="appliedx-custom-discipline" class="appliedx-custom-settings" data-filter-mapping="discipline">
+                        <label for="appliedx-custom-stream">Stream</label>
+                        <select id="appliedx-custom-stream" class="appliedx-custom-settings" data-filter-mapping="stream">
                                 <option>Engineering</option>
                                 <option>Management</option>
                                 <option>Sales</option>
@@ -306,10 +317,34 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
                         <span class="tip tip-stacked">${_("The subject matter your course deals with.")}</span>
                 </li>
                 <li class="field text">
-                        <label for="appliedx-custom-accelerator">Accelerator</label>
-                        <input type="text" id="appliedx-custom-accelerator" class="appliedx-custom-settings" data-filter-mapping="accelerator">
-                        <span class="tip tip-stacked">${_(" Enter the abbreviated name if the course is part of a strategic accelerator for e.g. PDE2-PCM, PDE2-QDM, PDE2-TCM, PDE2-PMM, CEE, PDE1 etc.")}</span>
+                        <label for="appliedx-custom-program">Program</label>
+                        <input type="text" id="appliedx-custom-program" class="appliedx-custom-settings" data-filter-mapping="program">
+                        <span class="tip tip-stacked">${_(" Enter the program name if the course is a part of an AMAT program. If the course is part of a strategic accelerator, enter the abbreviated name e.g. PDE2-PCM, PDE2-QDM, PDE2-TCM, PDE2-PMM, CEE, PDE1 etc.")}</span>
                </li>
+
+		<li class="field text">
+                        <label for="appliedx-custom-topics">Topics</label>
+                        <input type="text" id="appliedx-custom-topics" class="appliedx-custom-settings" data-filter-mapping="topics">
+                        <span class="tip tip-stacked">${_("The main category your course falls under")}</span>
+
+                </li>
+		<li class="field text">
+                        <label for="appliedx-custom-subtopics">Subtopics</label>
+                        <input type="text" id="appliedx-custom-subtopics" class="appliedx-custom-settings" data-filter-mapping="subtopics">
+                        <span class="tip tip-stacked">${_("Specific subjecct the course is created to cover.")}</span>
+
+                </li>
+
+		 <li class="field">
+                        <label for="appliedx-custom-keywords">Tags</label>
+			<div>
+				<input type='text' class='input-keyword'/>
+				<ul class='input-keyword-suggestions' style="display:none"></ul>
+				<div class='keywords'></div>
+				<input type='hidden' id="appliedx-custom-keywords" class="appliedx-custom-settings" data-filter-mapping="tags">
+			</div>
+                        <span class="tip tip-stacked">${_("This can be a sub-topic or any word that a user can search your coure with. All keyswords those can help searching your course go here.")}</span>
+                </li>
               </ol>
             </section>
 
@@ -322,7 +357,7 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
               </header>
               <ol class="list-input">
                 % if short_description_editable:
-                <li class="field text" id="field-course-short-description" style="display:none">
+                <li class="field text" id="field-course-short-description" style="display:none1">
                   <label for="course-overview">${_("Course Short Description")}</label>
                   <textarea class="text" id="course-short-description"></textarea>
                   <span class="tip tip-stacked">${_("Appears on the course catalog page when students roll over the course name. Limit to ~150 characters")}</span>
@@ -504,7 +539,7 @@ SetFilterValues = function(){
         }
         $(".appliedx-custom-settings").each(function(){
                 control = $(this);
-                value = filterMapping[$(control).attr("data-filter-mapping")];
+		value = filterMapping[$(control).attr("data-filter-mapping")];
                 if($(control).prop("tagName").toUpperCase() == "INPUT"){
                         switch($(control).attr("type").toUpperCase()){
                                 case "TEXT":
@@ -513,7 +548,14 @@ SetFilterValues = function(){
                                 case "CHECKBOX":
                                         $(control).prop("checked", value==undefined?false:value);
                                         break;
+				case "HIDDEN":
+					$(control).val(value==undefined?"":value)
+					var keywords = $("#appliedx-custom-keywords").attr("value").split(",")
+					for(keyword in keywords){
+						AppendKey(keywords[keyword]);
+					}
                         }
+
                 }
                 if($(control).prop("tagName").toUpperCase() == "SELECT"){
                         control = $(this);
@@ -524,29 +566,180 @@ SetFilterValues = function(){
 setTimeout(function(){
         SetFilterValues();
         $(".appliedx-custom-settings").change(function(e){
-                var filterMapping = {};
-                $(".appliedx-custom-settings").each(function(){
-                        control = $(this);
-                        if($(control).prop("tagName").toUpperCase() == "INPUT"){
-                                switch($(control).attr("type").toUpperCase()){
-                                        case "TEXT":
-                                                filterMapping[$(control).attr("data-filter-mapping")] = $(control).val();
-                                                break;
-                                        case "CHECKBOX":
-                                                filterMapping[$(control).attr("data-filter-mapping")] = $(control).prop("checked");
-                                                break;
-                                }
-                        }
-                        if($(control).prop("tagName").toUpperCase() == "SELECT"){
-                                debugger;
-                                control = $(this);
-                                filterMapping[$(control).attr("data-filter-mapping")] = $($("option", $(control))[$(control)[0].selectedIndex]).text();
-                        }
-                });
-                filterMapping = JSON.stringify(filterMapping)
-                $("#course-short-description").val(filterMapping);
-                $("#course-short-description").change();
+		AggregateFilters();
         });
 }, 2000);
+
+AggregateFilters = function(){
+	var filterMapping = {};
+        $(".appliedx-custom-settings").each(function(){
+        	control = $(this);
+                if($(control).prop("tagName").toUpperCase() == "INPUT" && $(control).val() != ""){
+                        switch($(control).attr("type").toUpperCase()){
+                                case "TEXT":
+                                        filterMapping[$(control).attr("data-filter-mapping")] = $(control).val();
+                                        break;
+                                case "CHECKBOX":
+                                        filterMapping[$(control).attr("data-filter-mapping")] = $(control).prop("checked");
+                                        break;
+                        }
+			
+                }
+                if($(control).prop("tagName").toUpperCase() == "SELECT" && $(control)[0].selectedIndex != -1){
+                        //debugger;
+                        control = $(this);
+                        filterMapping[$(control).attr("data-filter-mapping")] = $($("option", $(control))[$(control)[0].selectedIndex]).text();
+                }
+        });
+	filterMapping["tags"] = CollectKeywords();
+        filterMapping = JSON.stringify(filterMapping)
+        $("#course-short-description").val(filterMapping);
+        $("#course-short-description").change();
+}
+
+var CollectKeywords = function(){
+	var keywords = [];
+	$(".keyword").each(function(){
+		keywords.push($(this).text().trim().substr(0, $(this).text().trim().length - 1))
+	});
+	return keywords;
+}
+
+var suggestionKeywords = []
+
+AppendKey = function(keyword){
+	$(".keywords").append("<span class='keyword' style='display:none'>"+keyword+"<span class='delete_keyword'>&times;</span></span>");
+	$(".keyword").last().fadeIn();
+	$(".input-keyword").val("");
+	$("#appliedx-custom-keywords").val(JSON.stringify(KeyWordList()));
+	//if(suggestionKeywords.indexOf(keyword) == -1) 
+	return keyword
+	//return false
+}
+AppendKeyFromInput = function(){
+        var keyword = $(".input-keyword").val();
+	return AppendKey(keyword)
+}
+PushKeyToInput = function(key){
+	$(".input-keyword").val(key);
+	$(".input-keyword-suggestions").hide();
+	$(".input-keyword").focus();
+}
+HighlightNextSuggestion = function(){
+	if(!$(".suggestion-hovered").length)
+		$(".input-keyword-suggestions li").first().addClass("suggestion-hovered")
+	else if($(".suggestion-hovered").next().length){
+		$(".suggestion-hovered").next().addClass("suggestion-hovered")
+		$(".suggestion-hovered").first().removeClass("suggestion-hovered")
+	}
+}
+HighlightPreviousSuggestion = function(){
+	if(!$(".suggestion-hovered").length)
+		$(".input-keyword-suggestions li").last().addClass("suggestion-hovered")
+	else if($(".suggestion-hovered").prev().length){
+		$(".suggestion-hovered").prev().addClass("suggestion-hovered")
+		$(".suggestion-hovered").last().removeClass("suggestion-hovered")
+	}
+}
+KeyWordList = function(){
+	var keyWordList = [];
+	$(".keyword").each(function(e){
+		keyWordList.push($(this).text().substr(0, $(this).text().length - 1));
+	});
+	return keyWordList;	
+}
+Suggestions = function(operation, key){
+	url = ""
+	switch(operation){
+		case "+": url = "/insert_search_tag?key=" + key
+			break;
+		case "-": url = "/delete_search_tag?key=" + key
+			break;
+		default: url = "/get_search_tags"
+                        break;
+	}
+	//if(!key) return;
+        $.ajax({
+                url: url,
+                success: function(result){
+                	suggestionKeywords = []
+                        for(key in result.keys)
+                                suggestionKeywords.push(key);
+			//suggestionKeywords = result.responseText.split(",");
+                        //setTimeout(function(){$(".wrapper-notification").removeClass("is-shown");}, 100);
+                },
+                error: function(result){
+			suggestionKeywords = []
+                        for(key in result.keys)
+                                suggestionKeywords.push(key);
+
+                }
+        });
+}
+setTimeout(function(){
+$(document).ready(function(){
+	/*$.ajax({
+        	url: "/get_search_tags",
+	        success: function(result){
+                        suggestionKeywords = []
+                        for(key in result.keys)
+                                suggestionKeywords.push(key);
+		       // setTimeout(function(){$(".wrapper-notification").removeClass("is-shown");}, 100);
+        	},
+	        error: function(result){
+                        suggestionKeywords = []
+                        for(key in result.keys)
+                                suggestionKeywords.push(key);
+                        //setTimeout(function(){$(".wrapper-notification").removeClass("is-shown");}, 100);
+	        }
+	});*/
+	Suggestions();
+	$(".input-keyword").keyup(function(e){
+		//debugger;
+		if($(e.target).val() == "") return;
+		switch(e.keyCode){
+		case 13:if($(".suggestion-hovered").length)
+			PushKeyToInput($(".suggestion-hovered").text());
+			Suggestions("+", AppendKeyFromInput());
+			AggregateFilters();
+			break;
+		case 27:PushKeyToInput("");
+			break;
+		case 40:HighlightNextSuggestion();
+			break;
+		case 38:HighlightPreviousSuggestion();
+			break;
+		default:$(".input-keyword-suggestions").hide();
+			var iKeyword = $(".input-keyword").val();
+			var suggestions = [];
+			$(".input-keyword-suggestions").html("");
+			for(keyword in suggestionKeywords){
+				var firstKWIndex = suggestionKeywords[keyword].indexOf(iKeyword);
+				if(firstKWIndex != -1){
+					suggestions.push(suggestionKeywords[keyword]);
+					var wordHTML = suggestionKeywords[keyword].substring(0, firstKWIndex );
+					wordHTML += "<b>"+iKeyword+"</b>";
+					var tail = (suggestionKeywords[keyword].length - firstKWIndex - iKeyword.length);
+					wordHTML +=   tail?suggestionKeywords[keyword].substr(-1 * tail):"";
+					$(".input-keyword-suggestions").append("<li>"+wordHTML+"</li>");
+					$(".input-keyword-suggestions").show();
+				}
+			}
+		}	
+	});
+	$(".input-keyword-suggestions").click(function(e){
+		PushKeyToInput($(e.target).text());
+	});
+	$(".keywords").click(function(e){
+		if($(e.target).hasClass("delete_keyword")){
+			$(e.target).parent().fadeOut(function(){
+				Suggestions("-", $(e.target).parent().text().trim().substr(0, $(this).text().trim().length - 1));
+				$(e.target).parent().remove();
+				$("#appliedx-custom-keywords").val(JSON.stringify(KeyWordList()));
+				AggregateFilters();
+			})
+		}
+	});
+});}, 3000);
 </script>
 </%block>
