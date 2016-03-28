@@ -285,6 +285,7 @@ def sign_cloudfront_url(request):
     import os 
     from path import Path as path
     url = request.GET['url']
+    url = url.replace(" ", "+");
     SERVICE_VARIANT = os.environ.get('SERVICE_VARIANT', None)
     CONFIG_ROOT = path(os.environ.get('CONFIG_ROOT', "/edx/app/edxapp/"))
     CONFIG_PREFIX = SERVICE_VARIANT + "." if SERVICE_VARIANT else ""
@@ -300,4 +301,54 @@ def sign_cloudfront_url(request):
     http_resource = url
     dist = cf.get_all_distributions()[0].get_distribution()
     http_signed_url = dist.create_signed_url(http_resource, key_pair_id, expires, private_key_file=priv_key_file)
+#    raise NotImplementedError(url + "\n" + http_signed_url)
     return HttpResponse(http_signed_url)
+
+def get_keywords(request):
+    keywords = open('/edx/app/edxapp/search/keywords', 'r')
+    return HttpResponse(keywords)
+
+def add_keyword(request):
+    try:
+        keyFileHandler = open('/edx/app/edxapp/search/keywords', 'r')
+        keywords = json.loads(keyFileHandler.read())
+        keyFileHandler.close()
+        key = request.GET['key']
+ 	if(keywords["keys"].get(key)):
+	    keywords["keys"][key] = keywords["keys"][key] + 1;
+	else:
+	    keywords["keys"][key] = 1
+        keyFileHandler = open('/edx/app/edxapp/search/keywords', 'w')
+        keyFileHandler.write(json.dumps(keywords))
+        keyFileHandler.close()
+    except Exception, e:
+        return HttpResponse(e)
+    return HttpResponse(json.dumps(keywords))
+
+
+def get_auth_token(request):
+    try:
+	uid = request.GET['uid']
+        keyFileHandler = open('/edx/app/edxapp/auths/' + uid,'r')
+        token = keyFileHandler.read()
+        keyFileHandler.close()
+    except Exception, e:
+        return HttpResponse(e)
+    return HttpResponse(token)
+    #return HttpResponse("<html><body><div style='font-family:Calibri; font-size:18px; color:#7777aa; text-align:center;'>Sample Response</div></body></html>")
+
+def rem_keyword(request):
+    try:
+        keyFileHandler = open('/edx/app/edxapp/search/keywords', 'r')
+        keywords = json.loads(keyFileHandler.read())
+        keyFileHandler.close()
+        key = request.GET['key']
+        if(keywords["keys"].get(key)):
+            keywords["keys"][key] = keywords["keys"][key] - 1;
+        keyFileHandler = open('/edx/app/edxapp/search/keywords', 'w')
+        keyFileHandler.write(json.dumps(keywords))
+        keyFileHandler.close()
+    except Exception, e:
+        return HttpResponse(e)
+    return HttpResponse(json.dumps(keywords))
+
