@@ -48,6 +48,12 @@ urlpatterns = patterns(
 
     url(r'^xmodule/', include('pipeline_js.urls')),
     url(r'^heartbeat$', include('heartbeat.urls')),
+    url(r'^get_search_tags$', 'util.views.get_keywords'),
+
+    url(r'^insert_search_tag$', 'util.views.add_keyword'),
+
+    url(r'^delete_search_tag$', 'util.views.rem_keyword'),
+
 
     url(r'^user_api/', include('openedx.core.djangoapps.user_api.legacy_urls')),
 )
