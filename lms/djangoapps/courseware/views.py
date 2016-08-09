@@ -1640,7 +1640,7 @@ def credit_requested_details(request):
 		credit_requested = request_date
     req_date = ""
     if credit_requested <> "":
-        req_date = str(credit_requested.day) + " " +  ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"][credit_requested.month] + ", " + str(credit_requested.year) 
+        req_date = str(credit_requested.day) + " " +  ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"][credit_requested.month - 1] + ", " + str(credit_requested.year) 
     return HttpResponse(req_date)
 
 def capture_pass_criteria_attained(request):
