@@ -171,9 +171,11 @@ class CourseListView(ListAPIView):
         """
         username = self.request.query_params.get('username', self.request.user.username)
         courses = list()
-	if self.request.GET.get('mobile', "" )== "true":
-	    for course in list_courses(self.request, username):
-		if course.mobile_available:
-		    courses.append(course)
-	
-	return courses
+        if self.request.GET.get('mobile', "" )== "true":
+           for course in list_courses(self.request, username):
+               if course.mobile_available:
+                   courses.append(course)
+           return courses
+        else:
+            return list_courses(self.request, username)
+
