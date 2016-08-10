@@ -5,7 +5,7 @@ import boto
 import urllib2
 import requests
 import ssl
-
+import string
 from functools import wraps
 
 from django.conf import settings
@@ -468,7 +468,7 @@ def latest_app_version(request):
         version = ENV_TOKENS.get("MOBILE_APP_VERSION")
     except Exception, e:
         return HttpResponse(e)
-    return HttpResponse("{app_version:" + str(version) + "}")
+    return HttpResponse('{"app_version":"' + str(version) + '"}')
 
 def video_upload(request):
     if request.method == 'POST':
@@ -493,7 +493,7 @@ def video_upload(request):
 	    cf = boto.connect_cloudfront(aws_access_key_id, aws_secret_access_key)
 	    bucket_name = "edxvideo"
 	    bucket = s3.get_bucket(bucket_name)
-	    object_name = course_directory + "/" + filename
+	    object_name = course_directory + "/" + string.replace(filename, " ", "_")
 	    key = bucket.new_key(object_name)
 	    key.set_contents_from_filename('/tmp/' + filename)
             cloudFrontURL += object_name
@@ -530,3 +530,7 @@ def s3_video_list(request):
         return HttpResponse(e)
     return HttpResponse(video_list)
 
+
+def apple_app_site_association(request):
+    ''' Info page (link from main header) '''
+    return render_to_response("apple-app-site-association", {})
