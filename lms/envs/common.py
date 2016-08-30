@@ -1941,6 +1941,8 @@ INSTALLED_APPS = (
     'openedx.core.djangoapps.self_paced',
 
     'sorl.thumbnail',
+
+    'gamification_metric',
 )
 
 # Migrations which are not in the standard module "migrations"
