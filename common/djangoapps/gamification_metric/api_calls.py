@@ -35,7 +35,7 @@ class APICalls(object):
             'uid': uid,
         }
         headers = {
-            'API_KEY': self.GAMMA_PROPERTIES['APP_KEY'],
-            'API_SECRET': self.GAMMA_PROPERTIES['APP_SECRET']
+            'APP_KEY': self.GAMMA_PROPERTIES['APP_KEY'],
+            'APP_SECRET': self.GAMMA_PROPERTIES['APP_SECRET']
         }
         requests.put(self.GAMMA_PROPERTIES['API_URL'], data=data, headers=headers)
