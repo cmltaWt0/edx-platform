@@ -10,7 +10,7 @@ from api_calls import APICalls
 def send_achivenent(sender, instance, **kwargs):
     if instance.module_type in ('video', 'problem', 'course'):
         data = {
-            'user': instance.student.pk,
+            'username': instance.student.username,
             'course_id': unicode(instance.course_id),
             'event_type': instance.module_type,
             'uid': unicode(instance.module_state_key),

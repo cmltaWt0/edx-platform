@@ -27,15 +27,15 @@ class APICalls(object):
                         "You must set `{}` in `GAMMA_PROPERTIES`".format(param)
                     )
 
-    def api_call(self, course_id, user, event_type, uid):
+    def api_call(self, course_id, username, event_type, uid):
         data = {
             'course_id': course_id,
-            'user': user,
+            'username': username,
             'event_type': event_type,
             'uid': uid,
         }
         headers = {
-            'APP_KEY': self.GAMMA_PROPERTIES['APP_KEY'],
-            'APP_SECRET': self.GAMMA_PROPERTIES['APP_SECRET']
+            'App-key': self.GAMMA_PROPERTIES['APP_KEY'],
+            'App-secret': self.GAMMA_PROPERTIES['APP_SECRET']
         }
-        requests.put(self.GAMMA_PROPERTIES['API_URL'], data=data, headers=headers)
+        requests.put(self.GAMMA_PROPERTIES['API_URL'], data=data, headers=headers, verify=False)
