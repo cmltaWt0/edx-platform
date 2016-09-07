@@ -6,7 +6,7 @@ import json
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-
+from tasks import send_api_request
 
 @receiver(post_save, sender='courseware.StudentModule')
 def send_achivenent(sender, instance, **kwargs):
