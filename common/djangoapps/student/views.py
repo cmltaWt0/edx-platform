@@ -681,11 +681,41 @@ def dashboard(request):
         )
     else:
         redirect_message = ''
+	
+    #lists to store the courses that are completed and the ones that are in progress
+
+    import os
+    from path import Path as path
+    SERVICE_VARIANT = os.environ.get('SERVICE_VARIANT', None)
+    CONFIG_ROOT = path(os.environ.get('CONFIG_ROOT', "/edx/app/edxapp/"))
+    CONFIG_PREFIX = SERVICE_VARIANT + "." if SERVICE_VARIANT else ""
+    with open(CONFIG_ROOT / CONFIG_PREFIX + "env.json") as env_file:
+        ENV_TOKENS = json.load(env_file)
+    ext_orgs = ENV_TOKENS.get("EXTERNAL_COURSE_ORGANIZATIONS")
+
+    course_enrollments_complete = list()
+    course_enrollments_progress = list()
+    course_enrollments_external = list()
+    for enrollment in course_enrollments:
+	from opaque_keys.edx.locations import SlashSeparatedCourseKey
+	from courseware.courses import get_course_by_id
+	#course_id = SlashSeparatedCourseKey.from_deprecated_string(enrollment.course_id)
+	course = get_course_by_id(enrollment.course_id, depth=2)
+	if credit_requested_new(user, enrollment.course_id) != "":
+	    course_enrollments_complete.append(enrollment)
+        elif course.allow_public_wiki_access:
+	#Using unused setting allow_public_wiki_access to determine if the course is external
+            course_enrollments_external.append(enrollment)
+	else:
+	    course_enrollments_progress.append(enrollment)
 
     context = {
         'enrollment_message': enrollment_message,
         'redirect_message': redirect_message,
         'course_enrollments': course_enrollments,
+	'course_enrollments_complete' : course_enrollments_complete,
+	'course_enrollments_progress' : course_enrollments_progress,
+        'course_enrollments_external' : course_enrollments_external,
         'course_optouts': course_optouts,
         'message': message,
         'staff_access': staff_access,
@@ -2374,3 +2404,16 @@ def accept_honorcode(request):
     user_profile.meta = json.dumps(meta)
     user_profile.save()
     return HttpResponse(accepted_on)
+
+
+def credit_requested_new(user,courseId):
+    credit_requested = ""
+    for exam in StudentModule.objects.filter(student=user, course_id=courseId, module_type="course"):
+        state = json.loads(exam.state)
+        if state.get("credit_requested"):
+            request_date = datetime.datetime.strptime(state["credit_requested"], "%Y-%m-%d %H:%M:%S.%f")
+            if(credit_requested == "" or credit_requested < request_date):
+                credit_requested = request_date
+    return credit_requested
+
+
