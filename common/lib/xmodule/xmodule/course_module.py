@@ -597,15 +597,23 @@ class CourseFields(object):
     )
 
     allow_public_wiki_access = Boolean(
-        display_name=_("Allow Public Wiki Access"),
+        display_name=_("Is an external course"),
         help=_(
-            "Enter true or false. If true, edX users can view the course wiki even "
-            "if they're not enrolled in the course."
+            "Enter true if the course is developed and runs on an external platform, false if the course is native. "
         ),
         default=False,
         scope=Scope.settings
     )
 
+    #allow_public_wiki_access = Boolean(
+    #    display_name=_("Allow Public Wiki Access"),
+    #    help=_(
+    #        "Enter true or false. If true, edX users can view the course wiki even "
+    #        "if they're not enrolled in the course."
+    #    ),
+    #    default=False,
+    #    scope=Scope.settings
+    #)
     invitation_only = Boolean(
         display_name=_("Invitation Only"),
         help=_("Whether to restrict enrollment to invitation by the course staff."),
