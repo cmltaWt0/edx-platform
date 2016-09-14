@@ -94,7 +94,150 @@ if(localStorage["honor_code_skipped"] == undefined || localStorage["honor_code_s
     </%static:require_module>
   % endif
 </%block>
-
+<style>
+.enter-course{ display: none !important; }
+.my-courses {width: 100% !important; margin-top: 120px !important; }
+.dashboard-search-results {width: 100% !important; margin-top: 120px !important; }
+.dashboard .my-courses .listing-courses .course-item {
+    width: 250px;
+    float: left;
+    margin: 20px;
+    height: 250px;
+    position: relative;
+}
+.dashboard .my-courses .course .details .wrapper-course-details {
+    width: 100%;
+}
+.dashboard .my-courses .course .details .wrapper-course-image {
+    float: none;
+    margin-right: 0;
+    width: initial;
+    box-shadow: 0px 0px 10px #aaa;
+    max-height: 150px;
+    overflow: hidden;
+}
+.dashboard .my-courses .course .details .course-info {
+    display: none;
+}
+.dashboard .my-courses .course .details .wrapper-course-image .cover {
+    float: none;
+}
+.dashboard .my-courses .course .details .wrapper-course-details {
+    margin: 0px;
+}
+.course-item .wrapper-action-more {
+    position: absolute !important;
+    right: 5px; 
+    top: 155px;
+    border: solid 1px #ccc;
+    box-shadow: 1px 1px 5px #ccc;
+    background: #eee;
+}
+.dashboard .my-courses .course .details .course-title a{
+    margin-top: 10px;
+    margin-bottom: 0px;
+    height: 111px;
+    font-family: calibri;
+    padding: 5px 50px 5px 10px;
+    font-size: 19px;
+    line-height: 22px;
+}
+.dashboard .my-courses .course .details .course-actions .action{
+    margin-right:0px;
+}
+.dashboard-search-bar {
+    float: none;
+    margin-left: 0px;
+    margin-bottom: 20px;
+    width: 100%;
+    border: solid 1px #ccc;
+    padding: 10px;
+    height: 80px;
+    box-shadow: 0px 3px 10px #ccc;
+    position: absolute;
+}
+.details .wrapper-course-image .cover{
+    border:none !important;    
+    float: none !important;
+}
+.dashboard {
+    position: relative;
+}
+.dashboard .profile-sidebar {
+    margin-left: 0%;
+    position: absolute;
+    width: 100%;
+    top: 0px;
+}
+.wrapper-header-courses{
+    border-bottom: none !important;
+    float: left;
+    padding: 6px;
+    margin-bottom:0px !important;
+    margin-top: 4px;
+    padding-right: 25px;
+    margin-left:5px;
+    background: #aaa;
+}
+.wrapper-header-courses.active{
+    background: #00a8f0;
+    box-shadow: 2px 2px 10px #ccc inset;
+    border-radius: 0px;
+}
+.course-group-selector{
+    color: white;
+    margin:0px ;
+    line-height: 24px;
+    width:250px;
+    font: normal 17px "Calibri";
+}
+.tab-container{
+    width: 100%;
+    height: 45px;
+}
+.course-item .wrapper-action-more {
+    position: absolute !important;
+    right: 5px;
+    top: 220px;
+    border: none;
+    box-shadow: none;
+    background: transparent;
+}
+input[data-bind-element]{
+    float:left;
+    margin: 6px 10px;
+}
+.active{
+    background: #00a8f0;
+    box-shadow: 2px 2px 10px #ccc inset;
+}
+.dashboard .my-courses .course{
+    margin: 3px;
+    box-shadow: 0px 0px 12px #777;
+    height: 267px;
+}
+#courses-completed .course{
+    opacity: 0.4;
+}
+#courses-completed .course:hover{
+    opacity: 1;
+}
+.completed{
+    position: absolute;
+    top: 2%;
+    left: 87%;
+    font-family: "Wingdings 2";
+    font-size: 53px;
+    color: rgba(0, 168,0, 0.9);
+    z-index: 1;
+    width: 15px;
+    height: 20px;
+    border: solid 2px rgba(2, 2, 2, 0.3);
+    padding: 5px 10px 0px 0px;
+    text-shadow: -1px -1px white;
+    box-shadow: 0px 0px 5px #777 inset
+}
+</style>
 <div class="dashboard-notifications" tabindex="-1">
     %if message:
         <section class="dashboard-banner">
@@ -358,150 +501,6 @@ if(localStorage["honor_code_skipped"] == undefined || localStorage["honor_code_s
       </div>
     </form>
   </div>
-<style>
-.enter-course{ display: none !important; }
-.my-courses {width: 100% !important; margin-top: 120px !important; }
-.dashboard-search-results {width: 100% !important; margin-top: 120px !important; }
-.dashboard .my-courses .listing-courses .course-item {
-    width: 250px;
-    float: left;
-    margin: 20px;
-    height: 250px;
-    position: relative;
-}
-.dashboard .my-courses .course .details .wrapper-course-details {
-    width: 100%;
-}
-.dashboard .my-courses .course .details .wrapper-course-image {
-    float: none;
-    margin-right: 0;
-    width: initial;
-    box-shadow: 0px 0px 10px #aaa;
-    max-height: 150px;
-    overflow: hidden;
-}
-.dashboard .my-courses .course .details .course-info {
-    display: none;
-}
-.dashboard .my-courses .course .details .wrapper-course-image .cover {
-    float: none;
-}
-.dashboard .my-courses .course .details .wrapper-course-details {
-    margin: 0px;
-}
-.course-item .wrapper-action-more {
-    position: absolute !important;
-    right: 5px; 
-    top: 155px;
-    border: solid 1px #ccc;
-    box-shadow: 1px 1px 5px #ccc;
-    background: #eee;
-}
-.dashboard .my-courses .course .details .course-title a{
-    margin-top: 10px;
-    margin-bottom: 0px;
-    height: 111px;
-    font-family: calibri;
-    padding: 5px 50px 5px 10px;
-    font-size: 19px;
-    line-height: 22px;
-}
-.dashboard .my-courses .course .details .course-actions .action{
-    margin-right:0px;
-}
-.dashboard-search-bar {
-    float: none;
-    margin-left: 0px;
-    margin-bottom: 20px;
-    width: 100%;
-    border: solid 1px #ccc;
-    padding: 10px;
-    height: 80px;
-    box-shadow: 0px 3px 10px #ccc;
-    position: absolute;
-}
-.details .wrapper-course-image .cover{
-    border:none !important;    
-    float: none !important;
-}
-.dashboard {
-    position: relative;
-}
-.dashboard .profile-sidebar {
-    margin-left: 0%;
-    position: absolute;
-    width: 100%;
-    top: 0px;
-}
-.wrapper-header-courses{
-    border-bottom: none !important;
-    float: left;
-    padding: 6px;
-    margin-bottom:0px !important;
-    margin-top: 4px;
-    padding-right: 25px;
-    margin-left:5px;
-    background: #aaa;
-}
-.wrapper-header-courses.active{
-    background: #00a8f0;
-    box-shadow: 2px 2px 10px #ccc inset;
-    border-radius: 0px;
-}
-.course-group-selector{
-    color: white;
-    margin:0px ;
-    line-height: 24px;
-    width:250px;
-    font: normal 17px "Calibri";
-}
-.tab-container{
-    width: 100%;
-    height: 45px;
-}
-.course-item .wrapper-action-more {
-    position: absolute !important;
-    right: 5px;
-    top: 220px;
-    border: none;
-    box-shadow: none;
-    background: transparent;
-}
-input[data-bind-element]{
-    float:left;
-    margin: 6px 10px;
-}
-.active{
-    background: #00a8f0;
-    box-shadow: 2px 2px 10px #ccc inset;
-}
-.dashboard .my-courses .course{
-    margin: 3px;
-    box-shadow: 0px 0px 12px #777;
-    height: 267px;
-}
-#courses-completed .course{
-    opacity: 0.4;
-}
-#courses-completed .course:hover{
-    opacity: 1;
-}
-.completed{
-    position: absolute;
-    top: 2%;
-    left: 87%;
-    font-family: "Wingdings 2";
-    font-size: 53px;
-    color: rgba(0, 168,0, 0.9);
-    z-index: 1;
-    width: 15px;
-    height: 20px;
-    border: solid 2px rgba(2, 2, 2, 0.3);
-    padding: 5px 10px 0px 0px;
-    text-shadow: -1px -1px white;
-    box-shadow: 0px 0px 5px #777 inset
-}
-</style>
 <script type="text/javascript">
 $("input[data-bind-element]").change(function(e){
 	$("#" + $(e.currentTarget).attr("data-bind-element"))[0].style.display = $(e.currentTarget).prop("checked") ? "block" : "none";
