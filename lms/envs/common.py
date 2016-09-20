@@ -1943,6 +1943,7 @@ INSTALLED_APPS = (
     'sorl.thumbnail',
 
     'gamification_metric',
+    'referrals',
 )
 
 # Migrations which are not in the standard module "migrations"

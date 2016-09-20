@@ -11,6 +11,7 @@ from django.conf.urls.static import static
 import django.contrib.auth.views
 from microsite_configuration import microsite
 import auth_exchange.views
+import referrals.views
 
 from config_models.views import ConfigurationModelCurrentAPIView
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
@@ -108,6 +109,12 @@ urlpatterns = (
 
     url(r'^api/commerce/', include('commerce.api.urls', namespace='commerce_api')),
     url(r'^api/credit/', include('openedx.core.djangoapps.credit.urls', app_name="credit", namespace='credit')),
+    url(r'referral/', include('referrals.urls', app_name="referrals", namespace='referrals')),
+    url(
+        r'^api/get_referral_hash_key/',
+        referrals.views.GetHashKeyView.as_view(),
+        name="get_hash_key"
+    )
 )
 
 if settings.FEATURES["ENABLE_COMBINED_LOGIN_REGISTRATION"]:

@@ -38,9 +38,21 @@ from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 <%block name="js_extra">
   <script type="text/javascript" src="${static.url('js/jquery.treeview.js')}"></script>
   <script type="text/javascript" charset="utf-8">
-$(document).ready(function(){
-    $(".handouts").treeview({collapsed:true, unique:true/*, cookieId: "treeview-book-nav", persist: "cookie"*/});
-    });
+      $(document).ready(function () {
+          var domain_address = document.location.origin
+          $(".handouts").treeview({
+              collapsed: true,
+              unique: true/*, cookieId: "treeview-book-nav", persist: "cookie"*/
+          });
+          $(".course-referral-button").click(function () {
+              $.post(domain_address + "/api/get_referral_hash_key/", {'course_id': '${str(course_id)}'},
+                  function (data) {
+                      $('.course-referral-link').val(domain_address + data.hashkey).show();
+                      document.execCommand("copy");
+                  });
+
+          });
+      });
   </script>
 </%block>
 
@@ -59,6 +71,11 @@ $(document).ready(function(){
 
       <h1>${_("Course Updates &amp; News")}</h1>
       ${get_course_info_section(request, course, 'updates')}
+
+    <div class="course-referral">
+        <button class="course-referral-button">Invite friend</button>
+        <input class="course-referral-link" type="text" size="70" disabled>
+    </div>
     </section>
     <section aria-label="${_('Handout Navigation')}" class="handouts">
       % if False:

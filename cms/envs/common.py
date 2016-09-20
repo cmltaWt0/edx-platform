@@ -819,6 +819,7 @@ INSTALLED_APPS = (
     'lms.djangoapps.verify_student',
 
     'gamification_metric',
+    'referrals',
 )
 
 
