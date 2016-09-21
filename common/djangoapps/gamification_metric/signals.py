@@ -8,6 +8,7 @@ from django.dispatch import receiver
 
 from tasks import send_api_request
 from certificates.models import CertificateStatuses
+from referrals.models import ActivatedLinks
 
 
 @receiver(post_save, sender='courseware.StudentModule')
@@ -37,6 +38,20 @@ def send_enroll_achievement(sender, instance, created, **kwargs):
             'uid': '{}_{}'.format(instance.user.pk, course_id),
         }
         send_api_request(data)
+
+        activated_link = ActivatedLinks.objects.filter(
+            user=instance.user,
+            referral__course_id=course_id,
+            used=False
+        )
+        if activated_link:
+            data = {
+                'username': activated_link.referral.user.username,
+                'course_id': activated_link.referral.course_id,
+                'event_type': 'referrer',
+                'uid': '{}_{}_{}'.format(activated_link.referral.user.pk, activated_link.referral.course_id, 'referrer'),
+            }
+            send_api_request(data)
 
 
 @receiver(post_save, sender='certificates.GeneratedCertificate')

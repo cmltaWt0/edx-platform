@@ -8,16 +8,23 @@ from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import redirect, get_object_or_404
 
 from opaque_keys.edx.keys import CourseKey
-from models import Referrals
+from models import Referrals, ActivatedLinks
 from utils import hashkey_generator
 
 
 def user_referral(request, hashkey):
     referral = get_object_or_404(Referrals, hashkey=hashkey, status=Referrals.STATUS_ACTIVE)
-    request.session['referral'] = {
-        'course_id': unicode(referral.course_id),
-        'user_id': referral.user.pk
-    }
+    if not request.user.is_authenticated():
+        request.session['referral'] = {
+            'course_id': unicode(referral.course_id),
+            'user_id': referral.user.pk,
+            'referral_id': referral.id
+        }
+    else:
+        ActivatedLinks.objects.get_or_create(
+            referral=referral,
+            user=request.user
+        )
     course_redirect = reverse('course_root', kwargs={'course_id': unicode(referral.course_id)})
     return redirect(course_redirect)
 

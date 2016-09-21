@@ -17,3 +17,9 @@ class Referrals(models.Model):
     status = models.CharField(max_length=10, choices=STATUSES, default=STATUS_ACTIVE)
     created = models.DateTimeField(auto_now_add=True, null=True, db_index=True)
     updated = models.DateTimeField(auto_now=True, db_index=True)
+
+
+class ActivatedLinks(models.Model):
+    referral = models.ForeignKey(Referrals)
+    user = models.ForeignKey(User)
+    used = models.BooleanField(default=False)
