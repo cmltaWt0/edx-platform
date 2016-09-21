@@ -6,6 +6,7 @@ import json
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
+from opaque_keys.edx.keys import CourseKey
 from tasks import send_api_request
 from certificates.models import CertificateStatuses
 from referrals.models import ActivatedLinks
@@ -41,18 +42,21 @@ def send_enroll_achievement(sender, instance, created, **kwargs):
 
         activated_link = ActivatedLinks.objects.filter(
             user=instance.user,
-            referral__course_id=course_id,
+            referral__course_id=CourseKey.from_string(course_id),
             used=False
-        )
+        ).first()
         if activated_link:
+            uid = '{}_{}_{}'.format(activated_link.referral.user.pk, activated_link.referral.course_id, 'referrer')
             data = {
                 'username': activated_link.referral.user.username,
-                'course_id': activated_link.referral.course_id,
+                'course_id': course_id,
                 'event_type': 'referrer',
-                'uid': '{}_{}_{}'.format(activated_link.referral.user.pk, activated_link.referral.course_id, 'referrer'),
+                'uid': uid
             }
             send_api_request(data)
-
+            activated_link.used = True
+            # TODO uncomment this after debug finishing
+            # activated_link.save()
 
 @receiver(post_save, sender='certificates.GeneratedCertificate')
 def send_certificate_generation(sender, instance, created, **kwargs):
