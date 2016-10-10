@@ -25,8 +25,7 @@ def send_achievement(sender, instance, **kwargs):
             'event_type': instance.module_type,
             'uid': unicode(instance.module_state_key),
         }
-        # Return back using Celery with delay after tesing
-        send_api_request(data)
+        send_api_request.delay(data)
 
 
 @receiver(post_save, sender='student.CourseEnrollment')
@@ -39,8 +38,7 @@ def send_enroll_achievement(sender, instance, created, **kwargs):
             'event_type': 'enrollment',
             'uid': '{}_{}'.format(instance.user.pk, course_id),
         }
-        # Return back using Celery with delay after tesing
-        send_api_request(data)
+        send_api_request.delay(data)
 
         activated_link = ActivatedLinks.objects.filter(
             user=instance.user,
@@ -55,8 +53,7 @@ def send_enroll_achievement(sender, instance, created, **kwargs):
                 'event_type': 'referrer',
                 'uid': uid
             }
-            # Return back using Celery with delay after tesing
-            send_api_request(data)
+            send_api_request.delay(data)
             activated_link.used = True
             # TODO uncomment this after debug finishing
             # activated_link.save()
@@ -71,5 +68,4 @@ def send_certificate_generation(sender, instance, created, **kwargs):
             'event_type': 'course',
             'uid': '{}_{}'.format(instance.user.pk, course_id),
         }
-        # Return back using Celery with delay after tesing
-        send_api_request(data)
+        send_api_request.delay(data)
