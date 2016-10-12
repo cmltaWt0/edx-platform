@@ -1082,10 +1082,7 @@ def change_enrollment(request, check_access=True):
         if not CourseEnrollment.is_enrolled(user, course_id):
             return HttpResponseBadRequest(_("You are not enrolled in this course"))
         for exam in StudentModule.objects.filter(student=user, course_id=course_id, module_type="problem"):
-            try:
-	   	state = json.loads(exam.state)
-	    except:
-		raise NotImplementedError(exam)
+	    state = json.loads(exam.state)
             resetcount = 0;
             if(state.get("resetcount")):
                 resetcount = state["resetcount"]
