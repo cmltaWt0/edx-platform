@@ -945,8 +945,8 @@ def _progress(request, course_key, student_id):
         field_data_cache = grades.field_data_cache_for_grading(course, student)
         scores_client = ScoresClient.from_field_data_cache(field_data_cache)
 
-    courseware_summary = grades.progress_summary(
-        student, request, course, field_data_cache=field_data_cache, scores_client=scores_client
+    courseware_summary , count= grades.progress_summary(
+        student, request, course, field_data_cache=field_data_cache, scores_client=scores_client, show_count=True
     )
     grade_summary = grades.grade(
         student, request, course, field_data_cache=field_data_cache, scores_client=scores_client
@@ -959,7 +959,9 @@ def _progress(request, course_key, student_id):
 
     # checking certificate generation configuration
     show_generate_cert_btn = certs_api.cert_generation_enabled(course_key)
-
+    course = get_course_by_id(course_key)
+    answered = answered_count(request.user.id, course)
+   # raise NotImplementedError("")
     context = {
         'course': course,
         'courseware_summary': courseware_summary,
@@ -970,6 +972,8 @@ def _progress(request, course_key, student_id):
         'passed': is_course_passed(course, grade_summary),
         'show_generate_cert_btn': show_generate_cert_btn,
         'credit_course_requirements': _credit_course_requirements(course_key, student),
+        'answered' : answered,
+        'count' : count
     }
 
     if show_generate_cert_btn:
@@ -1617,6 +1621,8 @@ def capture_credit_requested(request):
     user = request.user
     course_id_str = request.GET['course_id']
     course_id = CourseKey.from_string(course_id_str.replace(" ", "+"))
+    StudentModule_PCSurvey = PCSurvey(user,course_id)
+  #  smod.save()
     for exam in StudentModule.objects.filter(student=user, course_id=course_id, module_type="course"):
         state = json.loads(exam.state)
         request_datetime = datetime.now()
@@ -1666,4 +1672,15 @@ def capture_pass_criteria_attained(request):
     #    exam.save()
     #return HttpResponse(request_datetime)
 
+def PCSurvey(user,course_id):
+    if len(Studentmodule.objects.filter(student=user, course_id=course_id, module_type="PCSurvey")) == 0:
+        smod = StudentModule(student=user, course_id=course_id, module_type="PCSurvey")
+        smod.save()
 
+def answered_count(user,course):
+    Problems = StudentModule.objects.filter(student=user,course_id=course.id,module_type="problem")
+    answered = 0
+    for s in Problems:
+        if json.loads(s.state).get('correct_map') :
+            answered+=1
+    return answered

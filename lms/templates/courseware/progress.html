@@ -34,10 +34,155 @@ from django.utils.http import urlquote_plus
 
 <%include file="/courseware/course_navigation.html" args="active_page='progress'" />
 
+<style>
+#reset_button{
+    padding: 5px 0px 8px;
+    margin: auto;
+    margin-top: 15px;
+    background: #1589FF;
+    text-align: center;
+    color: #FFF;
+    border: solid 1px #38ACEC;
+    width: 14%;
+    box-shadow: inset 0 1px 0 0 #3BB9FF;
+    font-weight: bold;
+    letter-spacing: 0;
+    font: normal 15px/1.6rem "Open Sans",Verdana,Geneva,sans-serif,sans-serif;
+    background-clip: padding-box;
+    border-radius: 3px;
+    box-sizing: border-box;
+    cursor:pointer;
+    text-shadow: 0 1px 0 #2B65Ec;
+}
+/*#reset_block{
+    padding: 10px;
+    border: double 2px #ccc;
+    margin-bottom: 30px;
+    background: #7DEC56;
+}
+.reset_msg{
+padding: 14px 0px 14px;
+    font-weight: normal;
+    color: #020201;
+    font-size: 14px;
+    font-family: calibri;
+    text-align: center;
+}
+.problems_answered_msg{
+padding: 14px 0px 14px;
+    font-weight: normal;
+    color: #020201;
+    font-size: 20px;
+    font-family: calibri;
+    text-align: center;
+}
+.problems_answered_msg1{
+padding: 14px 0px 14px;
+    font-weight: normal;
+    color: #020201;
+    font-size: 20px;
+    font-family: calibri;
+    text-align: center;
+}*/
+.icon-info{
+    padding: 2px 15px;
+    background: linear-gradient(to bottom, rgba(135,188,234,1) 0%,rgba(115,177,231,1) 24%,rgba(10,119,213,1) 50%,rgba(83,159,225,1) 79%,rgba(135,188,234,1) 100%);
+    border-radius: 6px;
+    color: white;
+    font-weight: bold;
+    font-size: 23px;
+    font-family: segoe ui;
+    text-shadow: 1px 1px #777;
+    box-shadow: 0px 0px 1px 2px rgba(208,228,247,1);
+    margin-right: 10px;
+}
+.icon-error{
+    padding: 0px 11px 6px 12px;
+    border-radius: 22px;
+    color: white;
+    font-size: 22px;
+    background: linear-gradient(to bottom, rgba(169,3,41,1) 0%,rgba(143,2,34,1) 44%,rgba(109,0,25,1) 100%);
+    box-shadow: 0px 0px 1px 2px #aaa;
+    font-family: calibri;
+    font-weight: bold;
+}
+.progress-info-block{
+    padding: 25px;
+    margin-bottom: 14px;
+    font-family: segoe UI;
+    background: #eee;
+    border: solid 1px #ccc;
+}
+.warning{
+    background: #eaeabe;
+    border: dotted 1px yellow;
+}
+.error{
+    background: #f9f2f2;
+    border: solid 1px #efe7e7;
+}
+.progress-info-block .text-block{
+    margin-left: 50px;
+    margin-top: -20px;
+}
+</style>
+
 <div class="container">
   <div class="profile-wrapper">
 
     <div class="course-info" id="course-info-progress" aria-label="${_('Course Progress')}">
+      % if not passed:
+        % if answered == 0:
+<div class="progress-info-block">
+	<span class='icon-info'>i</span>
+	<div class="text-block">Your progress will be depicted in the graph once you start taking tests.</div>
+</div>
+        % elif answered < count:
+<div class="progress-info-block warning">
+	<span class='icon-info'>i</span>
+	<div class="text-block">You do not have sufficient scores to request for credit yet, you need to answer all questions. (Attempted : ${answered} of ${count})</div>
+</div>
+        % else:
+<div class="progress-info-block" id="reset_course_msg" style="display:none">
+        <span class='icon-info'>i</span>
+        <div class="text-block">The course has been reset successfully</div>
+</div>
+<div class="progress-info-block error">
+    <span class='icon-error'>x</span>
+    <div class="text-block">Unfotunately, you could not obtain sufficient scores to get credit. Please click the button below to reset your course and take it again. Sectionwise scores below can help you decide which sections you may need to have another look at.</div>
+    	 <div id="reset_button">Reset my Course</div>
+    </div>
+<script type="text/javascript">
+$("#reset_button").click(function(){
+        $.ajax({
+                url: "/change_enrollment",
+                type: "POST",
+                data: {
+                        "enrollment_action":"reset",
+                        "course_id":"${course.id}"
+                },
+                success: function(result){
+                        $("#reset_button").hide();
+			$("#reset_block").hide();
+			$("#reset_msg").hide();
+			$(".progress-info-block").hide();
+                        $("#reset_course_msg").show();
+                },
+                error: function(result){
+			if(result.responseText == "/dashboard"){
+	                        $("#reset_button").hide();
+				$("#reset_block").hide();
+				$("#reset_msg").hide();
+	                        $(".progress-info-block").hide();
+	                        $("#reset_course_msg").show();
+			}
+                }
+        });
+}); 
+</script>
+
+        % endif
+      % endif
       % if staff_access and studio_url is not None:
         <div class="wrap-instructor-info">
           <a class="instructor-info-action studio-view" href="${studio_url | h}">${_("View Grading in studio")}</a>
@@ -67,20 +212,30 @@ from django.utils.http import urlquote_plus
 		$.ajax({
                         url: "/last_credit_request?course_id=${course.id}",
                         success: function(result){
+				//$('#credit_button').trigger('click');
 				if(result != null) $("#course-success").prepend("You have requested credit for taking the course on " + result.responseText)
-				else $("#credit_button").show();
+				else{
+				 	$("#credit_button").show();
+					$("#credit_button").click();
+				}
                 	},
                         error: function(result){
+				//$('#credit_button').trigger('click');
                                 if(result != null) $("#course-success").prepend("<div>You have requested credit for taking the course on " + result.responseText + ". To reinitiate credit request, please click <a onclick='javascript:window.open($(\"#credit_button\").attr(\"href\"))'>here</a></div>")
-                                else $("#credit_button").show(); 
+                                else{
+					$("#credit_button").show();
+                                        $("#credit_button").click();
+				}
                         }
                 });
 		$("#credit_button").click(function(){
         	        $.ajax({
 	                        url: "/credit_requested?course_id=${course.id}",
                 	        success: function(result){
+				document.location.href = $('#credit_button').attr("href");
 	                        },
         	                error: function(result){
+				document.location.href = $('#credit_button').attr("href");
 	                        }
         	        });
 		});
@@ -262,13 +417,12 @@ from django.utils.http import urlquote_plus
                   </em>
                 %endif
               </p>
-
               <div class="scores">
                 %if len(section['scores']) > 0:
                   <h3> ${ _("Problem Scores: ") if section['graded'] else _("Practice Scores: ")} </h3>
                   <ol>
                     %for score in section['scores']:
-                    <li>${"{0:.3n}/{1:.3n}".format(float(score.earned),float(score.possible)) | h}</li>
+                        <li>${"{0:.3n}/{1:.3n}".format(float(score.earned),float(score.possible)) | h}</li>
                     %endfor
                   </ol>
                 %else:
@@ -288,4 +442,18 @@ from django.utils.http import urlquote_plus
     </div>
   </div>
 </div>
+<script type="text/javascript">
+$(document).ready(function(){
+	setTimeout(function(){	
+		var index = 0;
+                $(".scores h3").each(function(){
+                        if(!$(this).hasClass("no-scores")){
+                                $(this).html("<div>Problem Scores for <span class='qname'>" + $(".tickLabel")[index].innerHTML+ "</span>");
+                                index++;
+                        }
+                });
+	}, 2000);
+});
+</script>
+
 

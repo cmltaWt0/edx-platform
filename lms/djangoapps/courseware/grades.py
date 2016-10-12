@@ -28,6 +28,8 @@ from .module_render import get_module_for_descriptor
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.signals.signals import GRADES_UPDATED
+from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
+from django.contrib.auth.models import User
 
 
 log = logging.getLogger("edx.courseware")
@@ -468,9 +470,8 @@ def _grade(student, request, course, keep_raw_scores, field_data_cache, scores_c
                         "Unable to grade a section with a total possible score of zero. " +
                         str(section_descriptor.location)
                     )
-
+        
         totaled_scores[section_format] = format_scores
-
     with outer_atomic():
         # Grading policy might be overriden by a CCX, need to reset it
         course.set_grading_policy(course.grading_policy)
@@ -515,15 +516,22 @@ def grade_for_percentage(grade_cutoffs, percentage):
     return letter_grade
 
 
-def progress_summary(student, request, course, field_data_cache=None, scores_client=None):
+def progress_summary(student, request, course, field_data_cache=None, scores_client=None, show_count=None):
     """
     Returns progress summary for all chapters in the course.
     """
-    progress = _progress_summary(student, request, course, field_data_cache, scores_client)
-    if progress:
-        return progress.chapters
-    else:
-        return None
+    if show_count: 
+        progress ,count = _progress_summary(student, request, course, field_data_cache, scores_client, show_count)
+        if progress:
+            return progress.chapters, count
+        else:
+            return None
+    else :
+        progress = _progress_summary(student, request, course, field_data_cache, scores_client, show_count)
+        if progress:
+            return progress.chapters
+        else:
+            return None
 
 
 def get_weighted_scores(student, course, field_data_cache=None, scores_client=None):
@@ -538,7 +546,7 @@ def get_weighted_scores(student, course, field_data_cache=None, scores_client=No
 # TODO: This method is not very good. It was written in the old course style and
 # then converted over and performance is not good. Once the progress page is redesigned
 # to not have the progress summary this method should be deleted (so it won't be copied).
-def _progress_summary(student, request, course, field_data_cache=None, scores_client=None):
+def _progress_summary(student, request, course, field_data_cache=None, scores_client=None, show_count=None):
     """
     Unwrapped version of "progress_summary".
 
@@ -588,11 +596,12 @@ def _progress_summary(student, request, course, field_data_cache=None, scores_cl
         # in the submissions API. As a further refactoring step, submissions should
         # be hidden behind the ScoresClient.
         max_scores_cache.fetch_from_remote(field_data_cache.scorable_locations)
-
     chapters = []
     locations_to_children = defaultdict(list)
     locations_to_weighted_scores = {}
     # Don't include chapters that aren't displayable (e.g. due to error)
+    count = 0
+    t=[]
     for chapter_module in course_module.get_display_items():
         # Skip if the chapter is hidden
         if chapter_module.hide_from_toc:
@@ -607,7 +616,6 @@ def _progress_summary(student, request, course, field_data_cache=None, scores_cl
 
                 graded = section_module.graded
                 scores = []
-
                 module_creator = section_module.xmodule_runtime.get_module
 
                 for module_descriptor in yield_dynamic_descriptor_descendants(
@@ -632,10 +640,9 @@ def _progress_summary(student, request, course, field_data_cache=None, scores_cl
                         module_descriptor.display_name_with_default,
                         module_descriptor.location
                     )
-
                     scores.append(weighted_location_score)
+		    count += 1
                     locations_to_weighted_scores[module_descriptor.location] = weighted_location_score
-
                 scores.reverse()
                 section_total, _ = graders.aggregate_scores(
                     scores, section_module.display_name_with_default)
@@ -650,16 +657,15 @@ def _progress_summary(student, request, course, field_data_cache=None, scores_cl
                     'due': section_module.due,
                     'graded': graded,
                 })
-
         chapters.append({
             'course': course.display_name_with_default,
             'display_name': chapter_module.display_name_with_default,
             'url_name': chapter_module.url_name,
-            'sections': sections
+            'sections': sections,
         })
-
     max_scores_cache.push_to_remote()
-
+    if show_count :
+        return ProgressSummary(chapters, locations_to_weighted_scores, locations_to_children), count
     return ProgressSummary(chapters, locations_to_weighted_scores, locations_to_children)
 
 
