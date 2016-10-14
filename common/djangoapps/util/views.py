@@ -6,6 +6,10 @@ import urllib2
 import requests
 import ssl
 import string
+import os
+import sys
+import re
+import tempfile
 from functools import wraps
 
 from django.conf import settings
@@ -384,9 +388,7 @@ def hello(request):
     return HttpResponse('hello')
 
 def sign_cloudfront_url(request):
-    import boto
     import time
-    import os 
     from path import Path as path
     url = request.GET['url']
     url = url.replace(" ", "+");
@@ -458,7 +460,6 @@ def rem_keyword(request):
 
 def latest_app_version(request):
     try:
-        import os
         from path import Path as path
         SERVICE_VARIANT = os.environ.get('SERVICE_VARIANT', None)
         CONFIG_ROOT = path(os.environ.get('CONFIG_ROOT', "/edx/app/edxapp/"))
@@ -480,18 +481,16 @@ def video_upload(request):
                 for chunk in request.FILES['file'].chunks():
                     destination.write(chunk)
     	    course_directory = request.POST['course_directory']
-    	    import os
-	    from path import Path as path
-	    SERVICE_VARIANT = os.environ.get('SERVICE_VARIANT', None)
-	    CONFIG_ROOT = path(os.environ.get('CONFIG_ROOT', "/edx/app/edxapp/"))
-	    CONFIG_PREFIX = SERVICE_VARIANT + "." if SERVICE_VARIANT else ""
- 	    with open(CONFIG_ROOT / CONFIG_PREFIX + "env.json") as env_file:
- 		ENV_TOKENS = json.load(env_file)
+            metadata = get_video_metadata('/tmp/' + filename)
+	    bitrate_in_kbps = to_kilo_bits_per_second(metadata['bitrate'])
+	    ENV_TOKENS = get_all_env_tokens()
+	    if bitrate_in_kbps > 2048:
+		return HttpResponse('{"status":"error", "message":"Video can not be uploaded due to unacceptable bitrate. If you are not sure how to fix it, please contact operations at appliedx_ops@amat.com"}')
 	    aws_access_key_id = ENV_TOKENS.get("AWS_ACCESS_KEY_ID")
 	    aws_secret_access_key = ENV_TOKENS.get("AWS_SECRET_ACCESS_KEY")
 	    s3 = boto.connect_s3(aws_access_key_id, aws_secret_access_key)
 	    cf = boto.connect_cloudfront(aws_access_key_id, aws_secret_access_key)
-	    bucket_name = "edxvideo"
+	    bucket_name = ENV_TOKENS.get("AWS_BUCKET_NAME")
 	    bucket = s3.get_bucket(bucket_name)
 	    object_name = course_directory + "/" + string.replace(filename, " ", "_")
 	    key = bucket.new_key(object_name)
@@ -499,7 +498,11 @@ def video_upload(request):
             cloudFrontURL += object_name
     	except Exception, e:
             return HttpResponse(e)
-    return HttpResponse(cloudFrontURL)
+    message = "Video has been uploaded succesfully."
+    if bitrate_in_kbps > 1536:
+	message += "Please note that bitrate is slightly higher than recommended."
+    response = '{"status":"success", "message":"' + message + '", "cloudfront_url":"' + cloudFrontURL + '", "metadata":' + json.dumps(metadata) + '}'
+    return HttpResponse(response)
 
 def upload(request):
     ''' Info page (link from main header) '''
@@ -509,7 +512,6 @@ def s3_video_list(request):
     video_list = "[]"
     try:
         foldername = request.GET['course_folder']
-        import os
         from path import Path as path
     	SERVICE_VARIANT = os.environ.get('SERVICE_VARIANT', None)
     	CONFIG_ROOT = path(os.environ.get('CONFIG_ROOT', "/edx/app/edxapp/"))
@@ -534,3 +536,57 @@ def s3_video_list(request):
 def apple_app_site_association(request):
     ''' Info page (link from main header) '''
     return render_to_response("apple-app-site-association", {})
+
+def get_video_metadata(filepath):
+    tmpf = tempfile.NamedTemporaryFile()
+    os.system("avconv -i \"%s\" 2> %s" % (filepath, tmpf.name))
+    lines = tmpf.readlines()
+    tmpf.close()
+    metadata = {}
+    for l in lines:
+        l = l.strip()
+        if l.startswith('Duration'):
+            metadata['duration'] = re.search('Duration: (.*?),', l).group(0).split(':',1)[1].strip(' ,')
+	    metadata['bitrate'] = re.search("bitrate: (\d+ kb/s)", l).group(0).split(':')[1].strip()
+	if l.startswith('Stream #0.0'):
+		metadata['video'] = {}
+		metadata['video']['codec'], metadata['video']['profile'] = \
+		[e.strip(' ,()') for e in re.search('Video: (.*? \(.*?\)),? ', l).group(0).split(':')[1].split('(')]
+		metadata['video']['resolution'] = re.search('([1-9]\d+x\d+)', l).group(1)
+		metadata['video']['bitrate'] = re.search('(\d+ kb/s)', l).group(1)
+		metadata['video']['fps'] = re.search('(\d+ fps)', l).group(1)
+	if l.startswith('Stream #0.1'):
+		metadata['audio'] = {}
+		metadata['audio']['codec'] = re.search('Audio: (.*?) ', l).group(1)
+		metadata['audio']['frequency'] = re.search(', (.*? Hz),', l).group(1)
+		metadata['audio']['bitrate'] = re.search(', (\d+ kb/s)', l).group(1)
+    return metadata
+
+def get_all_env_tokens():
+    try:
+        from path import Path as path
+        SERVICE_VARIANT = os.environ.get('SERVICE_VARIANT', None)
+        CONFIG_ROOT = path(os.environ.get('CONFIG_ROOT', "/edx/app/edxapp/"))
+        CONFIG_PREFIX = SERVICE_VARIANT + "." if SERVICE_VARIANT else ""
+        with open(CONFIG_ROOT / CONFIG_PREFIX + "env.json") as env_file:
+            ENV_TOKENS = json.load(env_file)
+    except Exception, e:
+        return HttpResponse(e)
+    return ENV_TOKENS
+
+def to_kilo_bits_per_second(raw):
+    split = raw.split(" ")
+    value = int(split[0])
+    denomination = split[1].split("/s")[0]
+    if denomination[0] == "k":
+        value *= 1
+    if denomination[0] == "m":
+        value *= 1000
+    if denomination[0] == "g":
+        value *= 1000000
+    if denomination[0] == "t":
+        value *= 1000000000
+    if denomination[1] == "B":
+        value *= 8
+    return value
+

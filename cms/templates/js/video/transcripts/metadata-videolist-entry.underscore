@@ -26,222 +26,290 @@
     <div class="wrapper-transcripts-message"></div>
 </div>
 <script type="text/javascript">
-		$(".wrapper-videolist-url").append($("#s3-video-interface").html());
-		$(".wrapper-videolist-url #player-video-url").html($(".wrapper-videolist-url input").val());
-		InsertDropdown = function(parent, objects, onSelectHandler){
-			$("select", $(parent)).remove();
-			selectHTML = "<select style='width:100%'>"
-			for(object in objects){		
-				selectHTML += "<option value='" + objects[object].value + "'>" + objects[object].key + "</option>"
-			}
-			selectHTML += "<select>"	
-			$(parent).append(selectHTML)
-			$("select", $(parent)).change(onSelectHandler);
+	$(".wrapper-videolist-url").append($("#s3-video-interface").html());
+	$(".wrapper-videolist-url #player-video-url").html($(".wrapper-videolist-url input").val());
+	InsertDropdown = function(parent, objects, onSelectHandler){
+		$("select", $(parent)).remove();
+		selectHTML = "<select style='width:100%'>"
+		for(object in objects){		
+			selectHTML += "<option value='" + objects[object].value + "'>" + objects[object].key + "</option>"
 		}
-		$(".video-action").click(function(e){
-			var target = $(e.currentTarget);
-			var optionContainer = $("#" + $(target).attr("data-option-container"));
-			$(optionContainer).show();
-			$(".action-box").hide();
-			$("#player-video-url").hide();
-			$(".wrapper-videolist-url input").hide();
-			switch ($(target).attr("data-option-container")) {
-				case "video_input_box":
-					$(".wrapper-videolist-url input").show()		
-					break;
-				case "video_select_box":
-					$("#video_select_box").show();
-					var courseId = $(".studio-xblock-wrapper").attr("data-course-key")
-
+		selectHTML += "<select>"	
+		$(parent).append(selectHTML)
+		$("select", $(parent)).change(onSelectHandler);
+	}
+	$(".video-action").click(function(e){
+		var target = $(e.currentTarget);
+		var optionContainer = $("#" + $(target).attr("data-option-container"));
+		$(optionContainer).show();
+		$(".action-box").hide();
+		$("#player-video-url").hide();
+		$(".wrapper-videolist-url input").hide();
+		switch ($(target).attr("data-option-container")) {
+			case "video_input_box":
+				$(".wrapper-videolist-url input").show()		
+				break;
+			case "video_select_box":
+				$("#video_select_box").show();
+				var courseId = $(".studio-xblock-wrapper").attr("data-course-key")
 					if(courseId != null)	courseId = courseId.replace(/[+:/]/g, '_'); 
-					folderName = courseId;
-					url = "/list_s3_videos?course_folder=" + folderName 
-					selectAction = function(e){
-						$(e.target).hide();
-	                                        showPopup($(e.target).val());
-						//$(".wrapper-videolist-url input[type='text']").val($(e.target).val());				
-						//$(".wrapper-videolist-url #player-video-url").html($(".wrapper-videolist-url input").val());
-						//$(".wrapper-videolist-url #player-video-url").attr("title", $(".wrapper-videolist-url input").val());
-						//$(".wrapper-videolist-url #player-video-url").show();				
-					}
-					$.ajax({
-               					url: url,
-	               				success: function(result){					
-							formattedResult = [];
-							for(key in result)
-								if(result[key].indexOf(result[key].length - 1) != "/")
-									formattedResult.push({"key" : result[key].replace(folderName + "/", ""), "value" :  "https://d2a8rd6kt4zb64.cloudfront.net/" + result[key]})
-                       					InsertDropdown(optionContainer, formattedResult, selectAction)
-                				},
-		                		error: function(result){
-							console.log("An error has occurred: " + result)
-               					}
-					});
-					break;
-				case "video_upload_box":
-					$("#video-file-upload").click();
-					break;
-			}	
-		});
-		/*$("#video-file-upload").change(function(){
-			var filename = $("#video-file-upload")[0].files[0].name;
-			if(filename != ""){
-				$("#upload-button").html("Click here to Upload " + filename);
-				$("#video_upload_box").show();
-			}
-		});*/
-		String.prototype.endsWithAny = String.prototype.endsWithAny || function(keyOrKeys){
-                        var doesEnd = false;
-                        if(keyOrKeys instanceof Array){
-                                for(key in keyOrKeys){
-                                        (doesEnd |= this.endsWithAny(keyOrKeys[key]));
-                                }
-                        }
-                        return (doesEnd || this.substring(this.length - keyOrKeys.length) == keyOrKeys) == true;
-		}
-		getMaxRecommenedBitRate = function(){
-			return 124;
-		}
-		getMaxAcceptableBitRate = function(){
-			return 186;
-		}
-                getRecommenedFileExtensions = function(){
-                        return [".mp4"];
-                }
-                getAcceptableFileExtensions = function(){
-                        return ["mp4", ".mpeg", ".webm", ".ogg"];
-                }
-		$("#video-file-upload").change(function(){
-			var filename = $("#video-file-upload")[0].files[0].name;
-			maxRecommenedBitRate = getMaxRecommenedBitRate()
-			maxAcceptableBitRate = getMaxAcceptableBitRate()
-			if(filename != ""){
-				if(!filename.endsWithAny(getAcceptableFileExtensions())) {
-					throwError("Sorry the file you are trying to upload is not valid. Please upload one of the following filetypes : (mpf, mpeg, webm, ogg)");
-					return;
-                                }
-                                if(!filename.endsWithAny(getRecommenedFileExtensions())) {
-
-                                }
-				reader = new FileReader();
-				reader.onload = function(e) {
-					var videoElement = document.createElement("video");
-					videoElement.src = e.target.result;
-					var timer = setInterval(function () {
-						if (videoElement.readyState === 4){
-							clearInterval(timer);
-							var duration = videoElement.duration.toFixed(2);
-							var size = $("#video-file-upload")[0].files[0].size;
-							var bitRateInKBps = size  / (duration * 1000) 
-							if (bitRateInKBps > maxRecommenedBitRate){
-								throwWarning("Bit rate of the video is higher than standard range.", uploaderProceed, null);
-							}
-							else if (bitRateInKBps > maxAcceptableBitRate){
-								throwError("Sorry, the video could not be uploaded since the bit rate of video is higher than the acceptable range.");
-							}
-							else {
-								uploaderProceed();
-							}
-							//clearInterval(tiimer);
-						}
-        				}, 500)
-        			};
-				reader.readAsDataURL($("#video-file-upload")[0].files[0]);
-			}
-		});
-		uploaderProceed = function (){
-			$("#upload-button").html("Click to Upload " + $("#video-file-upload")[0].files[0].name);
+				folderName = courseId;
+				url = "/list_s3_videos?course_folder=" + folderName 
+				selectAction = function(e){
+					$(e.target).hide();
+                                        showSelectPopup($(e.target).val());
+					//$(".wrapper-videolist-url input[type='text']").val($(e.target).val());				
+					//$(".wrapper-videolist-url #player-video-url").html($(".wrapper-videolist-url input").val());
+					//$(".wrapper-videolist-url #player-video-url").attr("title", $(".wrapper-videolist-url input").val());
+					//$(".wrapper-videolist-url #player-video-url").show();				
+				}
+				$.ajax({
+              				url: url,
+               				success: function(result){					
+						formattedResult = [];
+						for(key in result)
+							if(result[key].indexOf(result[key].length - 1) != "/")
+								formattedResult.push({"key" : result[key].replace(folderName + "/", ""), "value" :  "https://d2a8rd6kt4zb64.cloudfront.net/" + result[key]})
+              					InsertDropdown(optionContainer, formattedResult, selectAction)
+	               			},
+		                	error: function(result){
+						console.log("An error has occurred: " + result)
+              				}
+				});
+				break;
+			case "video_upload_box":
+				$("#video-file-upload").click();
+				break;
+		}	
+	});
+	/*$("#video-file-upload").change(function(){
+		var filename = $("#video-file-upload")[0].files[0].name;
+		if(filename != ""){
+			$("#upload-button").html("Click here to Upload " + filename);
 			$("#video_upload_box").show();
-			$("#upload-button").show();
 		}
-		throwWarning = function(message, onYes, onNo){
-			if(confirm(message)) onYes();
-			else onNo();
-		}
-		throwError = function(message){
-			alert(message);
-		}
-		$("#upload-button").click(function(){
-			$("#upload-button").hide();
-			$(".uploader-progressbar-background").show()
-			var files =  $("#video-file-upload")[0].files;
-			var formData = new FormData();
-			var courseId = $(".studio-xblock-wrapper").attr("data-course-key")
-
-			if(courseId != null)	courseId = courseId.replace(/[+:/]/g, '_')
-			folderName = courseId;
-			formData.append('file', files[0], files[0].name);
-			formData.append('course_directory',  folderName);
-			var xhr = new XMLHttpRequest();
-			xhr.open('POST', '/upload_video', true);
-			var csrftoken = $.cookie('csrftoken');
-
-			xhr.setRequestHeader("X-CSRFToken", csrftoken);
-			var eventSource = xhr.upload || xhr;
-			eventSource.addEventListener("progress", function(e){
-				var current = e.loaded || e.position ;
-				var total = e.total || e.totalSize;
-				var percent = parseInt((current/total)*100, 10);
-				$(".uploader-progressbar").css("width",   percent + "%");
-			});
-			xhr.onload = function (e) {
-				if (xhr.status === 200) {
-					$("#upload-button").show();
-					$("#video_upload_box").hide();
-					$(".uploader-progressbar-background").hide();
-					showPopup(e.currentTarget.responseText);
-				} else {
-					alert('An error occurred!');
-				}
-			};
-                        url = "/list_s3_videos?course_folder=" + folderName
-			$.ajax({
-				url: url,
-				success: function(result){
-					var keyFound = false;
-					var keyName = folderName + "/" + files[0].name;
-					for(key in result){
-						if(result[key] == keyName){
-							keyFound = true;
-							break;
+	});*/
+	String.prototype.endsWithAny = String.prototype.endsWithAny || function(keyOrKeys){
+		var doesEnd = false;
+                if(keyOrKeys instanceof Array){
+                        for(key in keyOrKeys){
+                                (doesEnd |= this.endsWithAny(keyOrKeys[key]));
+                        }
+                }
+                return (doesEnd || this.substring(this.length - keyOrKeys.length) == keyOrKeys) == true;
+	}
+	getMaxRecommenedBitRate = function(){
+		return 124;
+	}
+	getMaxAcceptableBitRate = function(){
+		return 186;
+	}
+        getRecommenedFileExtensions = function(){
+                return [".mp4"];
+        }
+        getAcceptableFileExtensions = function(){
+                return ["mp4", ".mpeg", ".webm", ".ogg"];
+        }
+	$("#video-file-upload").change(function(){
+		debugger;
+		var filename = $("#video-file-upload")[0].files[0].name;
+		maxRecommenedBitRate = getMaxRecommenedBitRate()
+		maxAcceptableBitRate = getMaxAcceptableBitRate()
+		if(filename != ""){
+			if(!filename.endsWithAny(getAcceptableFileExtensions())) {
+				throwError("Sorry the file you are trying to upload is not valid. Please upload one of the following filetypes : (mpf, mpeg, webm, ogg)");
+				return;
+                        }
+                        if(!filename.endsWithAny(getRecommenedFileExtensions())) {
+                        }
+			/*reader = new FileReader();
+			reader.onload = function(e) {
+				var videoElement = document.createElement("video");
+				videoElement.src = e.target.result;
+				var timer = setInterval(function () {
+					if (videoElement.readyState === 4){
+						clearInterval(timer);
+						var duration = videoElement.duration.toFixed(2);
+						var size = $("#video-file-upload")[0].files[0].size;
+						var bitRateInKBps = size  / (duration * 1000) 
+						if (bitRateInKBps > maxRecommenedBitRate){
+							throwWarning("Bit rate of the video is higher than standard range.", uploaderProceed, null);
+						}
+						else if (bitRateInKBps > maxAcceptableBitRate){
+							throwError("Sorry, the video could not be uploaded since the bit rate of video is higher than the acceptable range.");
+						}
+						else {
+							uploaderProceed();
 						}
 					}
-					if(keyFound){
-						alert("A file with the same name already exists");
-			                        $(".uploader-progressbar-background").hide()
-					}
-					else xhr.send(formData);
-				},
-				error: function(result){
-					console.log("An error has occurred: " + result)
-				}
-			});
-
-		});
-		$(".wrapper-videolist-url input").blur(function(){
-			$(".wrapper-videolist-url input").hide();
-			$(".wrapper-videolist-url #player-video-url").html($(".wrapper-videolist-url input").val());
-			$(".wrapper-videolist-url #player-video-url").attr("title", $(".wrapper-videolist-url input").val());
-			$(".wrapper-videolist-url #player-video-url").show();
-                        $(".videolist-url").removeClass("glow")
-		});
-		showPopup = function(videoURL){
-			$(".modal-type-video").hide();
-			$(document.body).append($("#url-popup").html())
-			$(".popup-url").html(videoURL)
-			$(".popup-btn").click(function(){
-	                        $(".modal-type-video").show();
-				$(".videolist-url").show();
-				$(".videolist-url").val($(".popup-url").html().trim());
-				$(".videolist-url").select();
-				document.execCommand("copy");
-				$(".videolist-url").val("");
-				$(".popup-overlay").remove();
-				$(".videolist-url").focus();
-				$(".videolist-url").addClass("glow")
-				$(".videolist-url").attr("placeholder", "Paste the URL Here")
-			});
+        			}, 500)
+        		};
+			reader.readAsDataURL($("#video-file-upload")[0].files[0]);*/
+			uploaderProceed()
 		}
+	});
+
+	uploaderProceed = function (){
+		$("#upload-button").html("Click to Upload " + $("#video-file-upload")[0].files[0].name);
+		$("#video_upload_box").show();
+		$("#upload-button").show();
+	}
+	throwWarning = function(message, onYes, onNo){
+		if(confirm(message)) onYes();
+		else onNo();
+	}
+	throwError = function(message){
+		alert(message);
+	}
+	$("#upload-button").click(function(){
+		$("#upload-button").hide();
+		$(".uploader-progressbar-background").show()
+		var files =  $("#video-file-upload")[0].files;
+		var formData = new FormData();
+		var courseId = $(".studio-xblock-wrapper").attr("data-course-key")
+		if(courseId != null)	courseId = courseId.replace(/[+:/]/g, '_')
+		folderName = courseId;
+		formData.append('file', files[0], files[0].name);
+		formData.append('course_directory',  folderName);
+		var xhr = new XMLHttpRequest();
+		xhr.open('POST', '/upload_video', true);
+		var csrftoken = $.cookie('csrftoken');
+		xhr.setRequestHeader("X-CSRFToken", csrftoken);
+		var eventSource = xhr.upload || xhr;
+		eventSource.addEventListener("progress", function(e){
+			var current = e.loaded || e.position ;
+			var total = e.total || e.totalSize;
+			var percent = parseInt((current/total)*100, 10);
+			$(".uploader-progressbar").css("width",   percent + "%");
+		});
+		xhr.onload = function (e) {
+			if (xhr.status === 200) {
+				response = JSON.parse(xhr.responseText);
+				$("#upload-button").show();
+				$("#video_upload_box").hide();
+				$(".uploader-progressbar-background").hide();
+				showUploadPopup(response);
+			} else {
+				alert('An error occurred!');
+			}
+		};
+                url = "/list_s3_videos?course_folder=" + folderName
+		$.ajax({
+			url: url,
+			success: function(result){
+				var keyFound = false;
+				var keyName = folderName + "/" + files[0].name;
+				for(key in result){
+					if(result[key] == keyName){
+						keyFound = true;
+						break;
+					}
+				}
+				if(keyFound){
+					alert("A file with the same name already exists");
+		                        $(".uploader-progressbar-background").hide()
+				}
+				else xhr.send(formData);
+			},
+			error: function(result){
+				console.log("An error has occurred: " + result)
+			}
+		});
+	});
+	$(".wrapper-videolist-url input").blur(function(){
+		$(".wrapper-videolist-url input").hide();
+		$(".wrapper-videolist-url #player-video-url").html($(".wrapper-videolist-url input").val());
+		$(".wrapper-videolist-url #player-video-url").attr("title", $(".wrapper-videolist-url input").val());
+		$(".wrapper-videolist-url #player-video-url").show();
+                $(".videolist-url").removeClass("glow")
+	});
+
+	showUploadPopup = function(data){
+		debugger;
+		if(data.status == "error"){
+			alert(data.message);
+			return;	
+		}
+		showSelectPopup(data.cloudfront_url);
+		return;
+
+		$(".modal-type-video").hide();
+		$(document.body).append($("#upload-popup").html());
+		$("#metadata_bitrate").html(getValHTML(data.metadata.bitrate, "bitrate"));
+		$("#metadata_duration").html(getValHTML(data.metadata.duration, "duration"));
+		$("#metadata_video_bitrate").html(getValHTML(data.metadata.video.bitrate, "videobitrate"));
+		$("#metadata_video_codec").html(getValHTML(data.metadata.video.codec, "codec"));
+		$("#metadata_video_resolution").html(getValHTML(data.metadata.video.resolution, "resolution"));
+		$("#metadata_video_framerate").html(getValHTML(data.metadata.video.fps, "fps"));
+		$("#metadata_audio_bitrate").html(getValHTML(data.metadata.audio.bitrate, "audiobitrate"));
+		$("#metadata_audio_codec").html(getValHTML(data.metadata.audio.codec, "audiocodec"));
+		$("#metadata_audio_frequency").html(getValHTML(data.metadata.audio.frequency, "frequency"));
+		$("#upload_message").html(data.message);
+		$(".popup-url").html(data.cloudfront_url);
+		$("#upload_popup_btn").click(function(){
+        	        $(".modal-type-video").show();
+			$(".videolist-url").show();
+			$(".videolist-url").val($(".popup-url").html().trim());
+			$(".videolist-url").select();
+			document.execCommand("copy");
+			$(".videolist-url").val("");
+			$(".popup-overlay").remove();
+			$(".videolist-url").focus();
+			$(".videolist-url").addClass("glow")
+			$(".videolist-url").attr("placeholder", "Paste the URL Here")
+		});
+	}
+
+	showSelectPopup = function(videoURL){
+                $(".modal-type-video").hide();
+                $(document.body).append($("#select-popup").html())
+                $(".popup-url").html(videoURL)
+	        $("#select_popup_btn").click(function(){
+        	        $(".modal-type-video").show();
+                	$(".videolist-url").show();
+	                $(".videolist-url").val($(".popup-url").html().trim());
+        	        $(".videolist-url").select();
+                	document.execCommand("copy");
+	                $(".videolist-url").val("");
+        	        $(".popup-overlay").remove();
+                	$(".videolist-url").focus();
+                	$(".videolist-url").addClass("glow")
+        	        $(".videolist-url").attr("placeholder", "Paste the URL Here")
+	        });
+	}
+
+	function getValHTML(obj, attribute){
+		var error = 0, warning = 1, status = 2;
+		if(attribute == "bitrate" || attribute == "videobitrate"){
+			if(tokbs(obj) > 2000){
+				status = error;
+			}
+			if(tokbs(obj) > 1000){
+				status = warning;
+			}
+		}
+		if(attribute == "codec"){
+			if(obj != "h264"){
+				status = error;
+			}
+		}
+		if(attribute == "resolution"){
+			res = obj.split("x");
+			if(res[0] > 1920){
+				status = error;
+			}	
+			if(res[1] > 1080){
+				status = error;
+			}
+		}
+		if(status == error) return "<span class='metadata-error'>" + obj + "</span>";
+		if(status == warning) return "<span class='metadata-warning'>" + obj + "</span>";
+		return "<span class='metadata-success'>" + obj + "</span>";
+	}
+
+	function tokbs(input){
+		return (input).replace(" kb/s", "")
+	}
 </script>
 <style>
 .wrapper-videolist-url input{
@@ -265,6 +333,7 @@
 .uploader-progressbar{
         height: 24px; margin: 10px 0px; background: -webkit-linear-gradient(top,  #b4e391 0%,#61c419 50%,#b4e391 100%);
         background: linear-gradient(to bottom,  #b4e391 0%,#61c419 50%,#b4e391 100%); color: white; box-shadow: 1px 0px 5px 2px #61C418; width:0%;
+	text-align: left; padding-left: 10px; text-shadow: 2px 2px #61c419;
 }
 #upload-button{
         float: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 12px; font-weight: normal; margin-top: 0px; background:#9fd600; border-color:#9fd600; color: #444; font-weight: bold;
@@ -290,6 +359,56 @@
     box-shadow: 0px 0px 1px red;
   }
 }
+.summary-metadata table{
+	border-collapse: collapse;
+   	margin: 10px;
+    	width: 509px;
+	margin:0px;
+}
+.summary-metadata td{
+    padding: 5px 10px;
+    font-family: calibri;
+    white-space: nowrap;
+    border: solid 1px #ccc;
+    text-align: center;
+    font-size: 15px;
+    font-weight: bold;
+}
+.summary-metadata th {
+    padding: 5px;
+    font-weight: normal;
+    font-family: calibri;
+    font-size: 18px;
+    color: black;
+    border-bottom: solid 1px #ccc;
+    border-right: solid 1px #ccc;
+}
+.metadata-na{
+    color:#ccc;
+}
+.metadata-error{
+    color: red;
+}
+.metadata-warning{
+    color: orange;
+}
+.metadata-success{
+    color: green;
+}
+.upload-summary{
+    width: 300px;
+    text-align: center;
+    font-family: helvetica;
+    background: #aaa;
+    color: white;
+    border-top: solid 1px #777;
+    padding: 10px;
+}
+#upload_message{
+    text-align: center;
+    font-size: 12px;
+    font-weight: bold;
+}
 </style>
 <script id="s3-video-interface" type="text/template">
         <div id="video_input_box" class="action-box">
@@ -298,7 +417,7 @@
         </div>
         <div id="video_upload_box" class="action-box">
                 <div class="uploader-progressbar-background">
-                        <div class="uploader-progressbar"></div>
+                        <div class="uploader-progressbar">Processing</div>
                 </div>
                 <input type="file" id="video-file-upload" style="display:none"/>
                 <div id="upload-filename" style="display:none"> </div>
@@ -311,7 +430,7 @@
                 <div  class="video-action" data-option-container="video_upload_box">Upload</div>
         </div>
 </script>
-<script id="url-popup" type="text/template">>
+<script id="select-popup" type="text/template">
         <div class="popup-overlay">
                 <div class="popup-outline">
                 <div class="popup-heading">
@@ -319,9 +438,71 @@
                 </div>
                 <div class="popup-url">
                 </div>
-                <div class="popup-btn glow">
+                <div class="popup-btn glow" id="select_popup_btn">
                        Click to Copy URL
                 </div>
+                </div>
+        </div>
+</script>
+<script id="upload-popup" type="text/template">>
+        <div class="popup-overlay">
+                <div class="popup-outline">
+        	        <div class="popup-heading">
+                		CloudFront URL has been generated for the uploaded video
+	                </div>
+                        <div class="summary-metadata">
+                                <div style="width:486px; padding:10px; background:#ccc; border-top:solid 1px #aaa;">Upload Summary</div>
+                                <table>
+                                        <tr>
+                                                <th></th>
+                                                <th><div>Audio</div></th>
+                                                <th><div>Video</div></th>
+                                                <th><div>General</div></th>
+                                        </tr>
+                                        <tr>
+                                                <th>Duration</th>
+                                                <td class="metadata-na">n/a</td>
+                                                <td class="metadata-na">n/a</td>
+                                                <td><span id="metadata_duration"></span></td>
+                                        <tr>
+                                        <tr>
+                                                <th>Bitrate</th>
+                                                <td><span id="metadata_audio_bitrate"></span></td>
+                                                <td><span id="metadata_video_bitrate"></span></td>
+                                                <td><span id="metadata_bitrate"></span></td>
+                                        <tr>
+                                        <tr>
+                                                <th>Codec</th>
+                                                <td class="metadata-na">n/a</td>
+                                                <td><span id="metadata_video_codec"></span></td>
+                                                <td><span id="metadata_audio_codec"></span></td>
+                                        </tr>
+                                        <tr>
+                                                <th>Resolution</th>
+                                                <td class="metadata-na">n/a</td>
+                                                <td><span id="metadata_video_resolution"></span></td>
+                                                <td class="metadata-na">n/a</td>
+                                        </tr>
+                                        <tr>
+                                                <th>Framerate</th>
+                                                <td class="metadata-na">n/a</td>
+                                                <td><span id="metadata_video_framerate"></span></td>
+                                                <td class="metadata-na">n/a</td>
+                                        </tr>
+                                        <tr>
+                                                <th>Frequency</th>
+                                                <td class="metadata-na">n/a</td>
+                                                <td class="metadata-na">n/a</td>
+                                                <td><span id="metadata_audio_frequency"></span></td>
+                                        </tr>
+                                <table>
+                        </div>
+                        <div id="upload_message"></div>
+        	        <div class="popup-url">
+                	</div>
+	                <div class="popup-btn glow" id="uplaod_popup_btn">
+        	               Click to Copy URL
+                	</div>
                 </div>
         </div>
 </script>
