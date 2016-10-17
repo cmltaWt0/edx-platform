@@ -475,7 +475,8 @@ def video_upload(request):
     if request.method == 'POST':
         #if form.is_valid():
 	cloudFrontURL = "https://d2a8rd6kt4zb64.cloudfront.net/"
-	try:
+#	try:
+	if True:
 	    filename = request.FILES['file'].name
             with open('/tmp/' + filename, 'wb+') as destination:
                 for chunk in request.FILES['file'].chunks():
@@ -496,8 +497,8 @@ def video_upload(request):
 	    key = bucket.new_key(object_name)
 	    key.set_contents_from_filename('/tmp/' + filename)
             cloudFrontURL += object_name
-    	except Exception, e:
-            return HttpResponse(e)
+#    	except Exception, e:
+   #         return HttpResponse(e)
     message = "Video has been uploaded succesfully."
     if bitrate_in_kbps > 1536:
 	message += "Please note that bitrate is slightly higher than recommended."
@@ -548,14 +549,14 @@ def get_video_metadata(filepath):
         if l.startswith('Duration'):
             metadata['duration'] = re.search('Duration: (.*?),', l).group(0).split(':',1)[1].strip(' ,')
 	    metadata['bitrate'] = re.search("bitrate: (\d+ kb/s)", l).group(0).split(':')[1].strip()
-	if l.startswith('Stream #0.0'):
+	if l.startswith('Stream #0.') and re.search('Video: (.*? \(.*?\)),? ',l) is not None:
 		metadata['video'] = {}
 		metadata['video']['codec'], metadata['video']['profile'] = \
 		[e.strip(' ,()') for e in re.search('Video: (.*? \(.*?\)),? ', l).group(0).split(':')[1].split('(')]
 		metadata['video']['resolution'] = re.search('([1-9]\d+x\d+)', l).group(1)
 		metadata['video']['bitrate'] = re.search('(\d+ kb/s)', l).group(1)
 		metadata['video']['fps'] = re.search('(\d+ fps)', l).group(1)
-	if l.startswith('Stream #0.1'):
+	if l.startswith('Stream #0.') and re.search('Video: (.*? \(.*?\)),? ',l) is None:
 		metadata['audio'] = {}
 		metadata['audio']['codec'] = re.search('Audio: (.*?) ', l).group(1)
 		metadata['audio']['frequency'] = re.search(', (.*? Hz),', l).group(1)
