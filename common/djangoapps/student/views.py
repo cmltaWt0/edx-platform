@@ -709,6 +709,13 @@ def dashboard(request):
 	else:
 	    course_enrollments_progress.append(enrollment)
 
+    if (
+        settings.FEATURES.get('ENABLE_GAMMA', False) and
+        settings.FEATURES.get('GAMMA_PROPERTIES', {}) and
+        settings.FEATURES.get('GAMMA_PROPERTIES', {}).get('API_URL')
+    ):
+        api_url = settings.FEATURES.get('GAMMA_PROPERTIES', {}).get('API_URL')
+
     context = {
         'enrollment_message': enrollment_message,
         'redirect_message': redirect_message,
@@ -743,6 +750,7 @@ def dashboard(request):
         'nav_hidden': True,
         'course_programs': course_programs,
     	'honor_code_accepted': is_honor_code_accepted(request),
+        'api_url': api_url,
     }
 
     return render_to_response('dashboard.html', context)

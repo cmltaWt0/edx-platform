@@ -29,6 +29,19 @@ from django.utils.http import urlquote_plus
 <script>
   ${progress_graph.body(grade_summary, course.grade_cutoffs, "grade-detail-graph", not course.no_grade, not course.no_grade) | h}
 </script>
+<script type="text/javascript" charset="utf-8">
+$(document).ready(function () {
+    var domain_address = document.location.origin
+    $(".course-referral-button").click(function () {
+        $.post(domain_address + "/api/get_referral_hash_key/", {'course_id': '${str(course.id)}'},
+            function (data) {
+                $('.course-referral-link').val(domain_address + data.hashkey).show();
+                document.execCommand("copy");
+            });
+
+    });
+});
+</script>
 </%block>
 
 
@@ -136,8 +149,8 @@ padding: 14px 0px 14px;
 <div class="progress-info-block">
 	<span class='icon-info'>i</span>
 	<div class="text-block">Your progress will be depicted in the graph once you start taking tests.</div>
-</div> 
-        % elif answered == 0 and reset is not None : 
+</div>
+        % elif answered == 0 and reset is not None :
 <div class="progress-info-block">
         <span class='icon-info'>i</span>
         <div class="text-block">The course has been reset successfully. Please take the course again, to get the fresh scores.</div>
@@ -183,11 +196,15 @@ $("#reset_button").click(function(){
 			}
                 }
         });
-}); 
+});
 </script>
 
         % endif
       % endif
+        <div class="course-referral">
+            <button class="course-referral-button">Invite friend</button>
+            <input class="course-referral-link" type="text" size="70" disabled>
+        </div>
       % if staff_access and studio_url is not None:
         <div class="wrap-instructor-info">
           <a class="instructor-info-action studio-view" href="${studio_url | h}">${_("View Grading in studio")}</a>
@@ -458,7 +475,7 @@ $("#reset_button").click(function(){
 </div>
 <script type="text/javascript">
 $(document).ready(function(){
-	setTimeout(function(){	
+	setTimeout(function(){
 		var index = 0;
                 $(".scores h3").each(function(){
                         if(!$(this).hasClass("no-scores")){
@@ -469,5 +486,3 @@ $(document).ready(function(){
 	}, 2000);
 });
 </script>
-
-

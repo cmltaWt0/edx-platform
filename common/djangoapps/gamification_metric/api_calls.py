@@ -38,4 +38,9 @@ class APICalls(object):
             'App-key': self.GAMMA_PROPERTIES['APP_KEY'],
             'App-secret': self.GAMMA_PROPERTIES['APP_SECRET']
         }
-        requests.put(self.GAMMA_PROPERTIES['API_URL'], data=data, headers=headers, verify=False)
+        requests.put(
+            self.GAMMA_PROPERTIES['API_URL']+'gamma-profile/',
+            data=data,
+            headers=headers,
+            verify=False
+        )
