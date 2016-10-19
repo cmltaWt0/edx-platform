@@ -1674,7 +1674,7 @@ def capture_pass_criteria_attained(request):
     #return HttpResponse(request_datetime)
 
 def PCSurvey(user,course_id):
-    if len(Studentmodule.objects.filter(student=user, course_id=course_id, module_type="PCSurvey")) == 0:
+    if len(StudentModule.objects.filter(student=user, course_id=course_id, module_type="PCSurvey")) == 0:
         smod = StudentModule(student=user, course_id=course_id, module_type="PCSurvey")
         smod.save()
 
