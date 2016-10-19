@@ -132,10 +132,15 @@ padding: 14px 0px 14px;
 
     <div class="course-info" id="course-info-progress" aria-label="${_('Course Progress')}">
       % if not passed:
-        % if answered == 0:
+        % if answered == 0 and reset is None:
 <div class="progress-info-block">
 	<span class='icon-info'>i</span>
 	<div class="text-block">Your progress will be depicted in the graph once you start taking tests.</div>
+</div> 
+        % elif answered == 0 and reset is not None : 
+<div class="progress-info-block">
+        <span class='icon-info'>i</span>
+        <div class="text-block">The course has been reset successfully. Please take the course again, to get the fresh scores.</div>
 </div>
         % elif answered < count:
 <div class="progress-info-block warning">
@@ -212,33 +217,35 @@ $("#reset_button").click(function(){
 		$.ajax({
                         url: "/last_credit_request?course_id=${course.id}",
                         success: function(result){
-				//$('#credit_button').trigger('click');
-				if(result != null) $("#course-success").prepend("You have requested credit for taking the course on " + result.responseText)
+				if(result != null) $("#course-success").prepend("<div>You have requested credit for taking the course on " + result.responseText + ". To reinitiate credit request, please click <a onclick='javascript:window.open($(\"#credit_button\").attr(\"href\"))'>here</a></div>")
 				else{
 				 	$("#credit_button").show();
-					$("#credit_button").click();
+					//$("#credit_button").click();
+					InitiateAutoCompletion();
 				}
                 	},
                         error: function(result){
-				//$('#credit_button').trigger('click');
                                 if(result != null) $("#course-success").prepend("<div>You have requested credit for taking the course on " + result.responseText + ". To reinitiate credit request, please click <a onclick='javascript:window.open($(\"#credit_button\").attr(\"href\"))'>here</a></div>")
                                 else{
 					$("#credit_button").show();
-                                        $("#credit_button").click();
+					InitiateAutoCompletion();
+                                        //$("#credit_button").click();
 				}
                         }
                 });
-		$("#credit_button").click(function(){
+		//$("#credit_button").click(function(){
+		InitiateAutoCompletion = function() {
         	        $.ajax({
 	                        url: "/credit_requested?course_id=${course.id}",
                 	        success: function(result){
-				document.location.href = $('#credit_button').attr("href");
+					document.location.href = $('#credit_button').attr("href");
 	                        },
         	                error: function(result){
-				document.location.href = $('#credit_button').attr("href");
+					document.location.href = $('#credit_button').attr("href");
 	                        }
         	        });
-		});
+		}
+		//});
 	});
 	var creditURL = "${course.cert_name_long}";
 	var split = creditURL.split("C=");
@@ -417,12 +424,19 @@ $("#reset_button").click(function(){
                   </em>
                 %endif
               </p>
+	        <% index = 0 %>
               <div class="scores">
                 %if len(section['scores']) > 0:
                   <h3> ${ _("Problem Scores: ") if section['graded'] else _("Practice Scores: ")} </h3>
                   <ol>
                     %for score in section['scores']:
-                        <li>${"{0:.3n}/{1:.3n}".format(float(score.earned),float(score.possible)) | h}</li>
+		      %if section['attempts'][index] and len(section['attempts'])>0:
+                        <li><strong>${"{0:.3n}/{1:.3n}".format(float(score.earned),float(score.possible)) | h}</strong></li>
+                      %else :
+                        <li style="display:none">${"{0:.3n}/{1:.3n}".format(float(score.earned),float(score.possible)) | h}</li>
+                        <li>${"0/{0:.3n}".format(float(score.possible)) | h}</li>
+                      %endif
+			<% index+=1 %>
                     %endfor
                   </ol>
                 %else:

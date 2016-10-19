@@ -601,7 +601,6 @@ def _progress_summary(student, request, course, field_data_cache=None, scores_cl
     locations_to_weighted_scores = {}
     # Don't include chapters that aren't displayable (e.g. due to error)
     count = 0
-    t=[]
     for chapter_module in course_module.get_display_items():
         # Skip if the chapter is hidden
         if chapter_module.hide_from_toc:
@@ -616,6 +615,7 @@ def _progress_summary(student, request, course, field_data_cache=None, scores_cl
 
                 graded = section_module.graded
                 scores = []
+                attempts = []
                 module_creator = section_module.xmodule_runtime.get_module
 
                 for module_descriptor in yield_dynamic_descriptor_descendants(
@@ -640,10 +640,28 @@ def _progress_summary(student, request, course, field_data_cache=None, scores_cl
                         module_descriptor.display_name_with_default,
                         module_descriptor.location
                     )
+                    a = str(weighted_location_score).split("module_id=")[1].rsplit(")",1)
+                    block_id =  weighted_location_score.module_id.block_id
+                    block_usage_locator = eval(a[0])
+                    student_module = StudentModule.objects.filter(student = student.id, course_id = course.id, module_type = "problem" )
+                    smod = StudentModule.objects.filter(student = student.id, course_id = course.id, module_type = "problem", module_state_key = block_usage_locator)
+                    if len(smod) == 1 :
+                        if json.loads(smod[0].state).get('correct_map'):
+                            attempts.append(True)
+                        else :
+                            attempts.append(False)
+                    else :
+                        for i in student_module:
+                            if block_id == i.module_state_key.block_id:
+                                if json.loads(i.state).get('correct_map'):
+                                    attempts.append(True)
+                                else :
+                                     attempts.append(False)
                     scores.append(weighted_location_score)
 		    count += 1
                     locations_to_weighted_scores[module_descriptor.location] = weighted_location_score
                 scores.reverse()
+                attempts.reverse()
                 section_total, _ = graders.aggregate_scores(
                     scores, section_module.display_name_with_default)
 
@@ -656,6 +674,7 @@ def _progress_summary(student, request, course, field_data_cache=None, scores_cl
                     'format': module_format,
                     'due': section_module.due,
                     'graded': graded,
+                    'attempts' : attempts,
                 })
         chapters.append({
             'course': course.display_name_with_default,

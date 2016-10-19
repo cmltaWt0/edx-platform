@@ -960,8 +960,8 @@ def _progress(request, course_key, student_id):
     # checking certificate generation configuration
     show_generate_cert_btn = certs_api.cert_generation_enabled(course_key)
     course = get_course_by_id(course_key)
-    answered = answered_count(request.user.id, course)
-   # raise NotImplementedError("")
+    answered, reset = answered_count(request.user.id, course)
+    
     context = {
         'course': course,
         'courseware_summary': courseware_summary,
@@ -973,7 +973,8 @@ def _progress(request, course_key, student_id):
         'show_generate_cert_btn': show_generate_cert_btn,
         'credit_course_requirements': _credit_course_requirements(course_key, student),
         'answered' : answered,
-        'count' : count
+        'count' : count,
+        'reset' : reset
     }
 
     if show_generate_cert_btn:
@@ -1683,4 +1684,5 @@ def answered_count(user,course):
     for s in Problems:
         if json.loads(s.state).get('correct_map') :
             answered+=1
-    return answered
+    is_reset = json.loads(Problems[0].state).get('resetcount')
+    return answered, is_reset
