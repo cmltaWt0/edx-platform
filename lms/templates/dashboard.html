@@ -224,18 +224,12 @@ input[data-bind-element]{
 }
 .completed{
     position: absolute;
-    top: 2%;
-    left: 87%;
-    font-family: "Wingdings 2";
-    font-size: 53px;
+    top: -3%;
+    left: 80%;
+    font-size: 61px;
     color: rgba(0, 168,0, 0.9);
     z-index: 1;
-    width: 15px;
-    height: 20px;
-    border: solid 2px rgba(2, 2, 2, 0.3);
-    padding: 5px 10px 0px 0px;
-    text-shadow: -1px -1px white;
-    box-shadow: 0px 0px 5px #777 inset
+    text-shadow: -1px -1px rgba(0, 168,0, 0.4);
 }
 </style>
 <div class="dashboard-notifications" tabindex="-1">
@@ -255,15 +249,15 @@ input[data-bind-element]{
 <section class="container dashboard" id="dashboard-main">
       <section class="my-courses" id="my-courses" role="main" aria-label="Content">
       <div class="tab-container">
-      	<header class="wrapper-header-courses active">
+      	<header class="wrapper-header-courses active" style="display:none">
 	  <input type="checkbox" data-bind-element="courses-inprogress" checked id="show_inprogress"/>
           <label for="show_inprogress" class="course-group-selector">${_("Courses under progress")}</label>
 	</header>
-        <header class="wrapper-header-courses active">
+        <header class="wrapper-header-courses active" style="display:none">
           <input type="checkbox" data-bind-element="courses-completed" checked id="show_completed"/>
           <label for="show_completed" class="course-group-selector">${_("Courses Completed")}</label>
         </header>
-        <header class="wrapper-header-courses active">
+        <header class="wrapper-header-courses active" style="display:none">
           <input type="checkbox" data-bind-element="courses-external" checked id="show_external"/>
           <label for="show_external" class="course-group-selector">${_("External Courses")}</label>
         </header>
@@ -507,10 +501,10 @@ $("input[data-bind-element]").change(function(e){
 	$(e.currentTarget).prop("checked") ? $(e.currentTarget).closest(".wrapper-header-courses").addClass("active") : $(e.currentTarget).closest(".wrapper-header-courses").removeClass("active");
 });
 $("input[data-bind-element]").each(function(){
-	$(".course-item", $("#" + $(this).attr("data-bind-element"))).length == 0 && $(this).closest(".wrapper-header-courses").hide()
+	$(".course-item", $("#" + $(this).attr("data-bind-element"))).length > 0 && $(this).closest(".wrapper-header-courses").show()
 });
 $("#courses-completed .course-container").each(function(){
-	$(this).prepend("<div class='completed'>P</div>")
+	$(this).prepend("<div class='completed fa fa-check'></div>")
 });
 </script>
 </section>
