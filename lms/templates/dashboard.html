@@ -82,7 +82,11 @@ if(localStorage["honor_code_skipped"] == undefined || localStorage["honor_code_s
 
     });
   </script>
-
+<style>
+#container-chart .highcharts-subtitle {
+  font-size: 3em;
+}
+</style>
 <script>
 $(function() {
     $.get(
@@ -104,10 +108,14 @@ $(function() {
                             plotShadow: false
                         },
                         title: {
+                            text: '<h1>Your points</h1>',
+                            align: 'center'
+                        },
+                        subtitle: {
                             text: '<h1><b>'+points.points+'</b></h1>',
-                            align: 'center',
                             verticalAlign: 'middle',
-                            y: 65
+                            align: 'center',
+                            y: 50
                         },
                         tooltip: {
                             pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
@@ -124,7 +132,8 @@ $(function() {
                                 },
                                 startAngle: -90,
                                 endAngle: 90,
-                                center: ['50%', '75%']
+                                center: ['50%', '75%'],
+                                showInLegend: true
                             }
                         },
                         series: [{
@@ -166,10 +175,7 @@ $(function () {
                     type: 'spline'
                 },
                 title: {
-                    text: 'Student progress'
-                },
-                subtitle: {
-                    text: 'Shows Student points by day'
+                    text: 'Your progress'
                 },
                 xAxis: {
                     type: 'datetime',
@@ -220,12 +226,12 @@ $(function () {
                 },
 
                 series: [{
-                    name: 'Student progress',
+                    name: 'Points',
                     type: 'column',
                     data: points_by_day
                 },
                 {
-                    name: 'Accumulative progress',
+                    name: 'Progress',
                     type: 'area',
                     yAxis: 1,
                     data: accumulative_data
