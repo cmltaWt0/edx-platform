@@ -243,7 +243,7 @@ $(function() {
         function( data ) {
             for (i in data) {
                 $('#container-badges').append(
-                    '<img src="'+data[0].url+'" alt="Smiley face" height="100" width="100">'
+                    '<img src="'+data[i].url+'" alt="'+data[i].description+'" title="'+data[i].description+'"'+'" height="100" width="100">'
                 );
             }
         }
@@ -416,12 +416,14 @@ input[data-bind-element]{
     %endif
 </div>
 
-<div class="chart-holder" style="display:flex; max-width:1180px; margin:0 auto; padding: 20px 0 0;">
+<div class="chart-holder" style="max-width:1180px; margin:0 auto; padding: 20px 0 0;">
     <script src="https://code.highcharts.com/highcharts.js"></script>
     <script src="https://code.highcharts.com/modules/exporting.js"></script>
-    <div id="container-chart" style="min-width: 310px; height: 400px; max-width: 600px; margin: 0 auto"></div>
-    <div id="container-progress" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
-    <div id="container-badges" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+    <div class="chart-holder_row" style="display:flex;">
+      <div id="container-chart" style="width: 25%; height: 400px;"></div>
+      <div id="container-progress" style="width: 75%; height: 400px;"></div>
+    </div>
+    <div id="container-badges"></div>
 </div>
 
 <section class="container dashboard" id="dashboard-main">
