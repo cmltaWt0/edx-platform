@@ -88,6 +88,15 @@ if(localStorage["honor_code_skipped"] == undefined || localStorage["honor_code_s
 }
 </style>
 <script>
+Highcharts.setOptions({
+     colors: [
+         '#33ACD4',
+         '#008E00',
+         '#0094C2',
+         '#8CDEEB',
+         '#55C900',
+     ]
+});
 $(function() {
     $.get(
         "${api_url}"+"points/",
