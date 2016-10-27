@@ -88,6 +88,15 @@ if(localStorage["honor_code_skipped"] == undefined || localStorage["honor_code_s
 }
 </style>
 <script>
+Highcharts.setOptions({
+     colors: [
+         '#33ACD4',
+         '#008E00',
+         '#0094C2',
+         '#8CDEEB',
+         '#55C900',
+     ]
+});
 $(function() {
     $.get(
         "${api_url}"+"points/",
@@ -145,113 +154,101 @@ $(function() {
                     });
                 }
             );
-        }
-    );
-});
-</script>
-
-<script>
-$(function () {
-    $.get(
-        "${api_url}"+"progress/",
-        data={"username": "${ user.username | h }"},
-        function( data ) {
-            var points_by_day = [];
-            var accumulative_data = [];
-            for (var i in data) {
-                points_by_day.push([Date.parse(data[i].date), data[i].points]);
-                var accum = 0;
-                if (accumulative_data.length != 0) {
-                    accum = accumulative_data[accumulative_data.length-1][1] + data[i].points;
-                }
-                else {
-                    accum = data[i].points;
-                }
-                accumulative_data.push([Date.parse(data[i].date), accum]);
-            }
-
-            $('#container-progress').highcharts({
-                chart: {
-                    type: 'spline'
-                },
-                title: {
-                    text: 'Your progress'
-                },
-                xAxis: {
-                    type: 'datetime',
-                    dateTimeLabelFormats: {
-                        month: '%e. %b',
-                        year: '%b'
-                    },
-                    title: {
-                        text: 'Date'
+            $.get(
+                "${api_url}"+"badges/",
+                data={"username": "${ user.username | h }"},
+                function( data ) {
+                    for (i in data) {
+                        $('#container-badges').append(
+                            '<img src="'+data[i].url+'" alt="'+data[i].description+'" title="'+data[i].description+'"'+'" height="100" width="100">'
+                        );
                     }
-                },
-                yAxis: [{
-                    title: {
-                        text: null
-                    },
-                    labels: {
-                        align: 'left',
-                        x: 3,
-                        y: 16,
-                        format: '{value:.,0f}'
-                    },
-                    showFirstLabel: false
-                }, {
-                    gridLineWidth: 0,
-                    opposite: true,
-                    title: {
-                        text: null
-                    },
-                    labels: {
-                        align: 'right',
-                        x: -3,
-                        y: 16,
-                        format: '{value:.,0f}'
-                    },
-                    showFirstLabel: false
-                }],
-                tooltip: {
-                    headerFormat: '<b>{series.name}</b><br>',
-                    pointFormat: '{point.x:%e. %b}: {point.y:.2f}'
-                },
-
-                plotOptions: {
-                    spline: {
-                        marker: {
-                            enabled: true
+                }
+            );
+            $.get(
+                "${api_url}"+"statuses/",
+                function( data ) {
+                    var status_lines = [];
+                    var left = [];
+                    var right = [];
+                    for (i in data) {
+                        if (data[i].status_points <= points.points) {
+                            left.push(data[i].status_points);
                         }
+                        else if (data[i].status_points > points.points) {
+                            right.push(data[i].status_points);
+                        }
+                        status_lines.push({
+                          color: data[i].status_color,
+                          dashStyle: 'longdashdot',
+                          value: data[i].status_points,
+                          width: 5,
+                          label: {text: data[i].title, rotation: 0}
+                        });
                     }
-                },
-
-                series: [{
-                    name: 'Points',
-                    type: 'column',
-                    data: points_by_day
-                },
-                {
-                    name: 'Progress',
-                    type: 'area',
-                    yAxis: 1,
-                    data: accumulative_data
-                }]
-            });
-        }
-    );
-});
-</script>
-<script>
-$(function() {
-    $.get(
-        "${api_url}"+"badges/",
-        data={"username": "${ user.username | h }"},
-        function( data ) {
-            for (i in data) {
-                $('#container-badges').append(
-                    '<img src="'+data[i].url+'" alt="'+data[i].description+'" title="'+data[i].description+'"'+'" height="100" width="100">'
-                );
-            }
+                    if (left.length == 0) {
+                        var min_value = points.points - 40;
+                    }
+                    else {
+                        var min_value = Math.max(...left) - 40;
+                    }
+                    if (right.length == 0) {
+                        var max_value = points.points + 20;
+                    }
+                    else {
+                        var max_value = Math.min(...right) + 20;
+                    }
+                    if (min_value < 0) {
+                        min_value = 0;
+                    }
+                    $('#container-progress').highcharts({
+                        chart: {
+                            type: 'bar'
+                        },
+                        title: {
+                            text: 'Your Points Progress'
+                        },
+                        subtitle: {
+                            text: ''
+                        },
+                        xAxis: {
+                        categories: [''],
+                            title: {
+                                text: null
+                            }
+                        },
+                        yAxis: {
+                            min: min_value,
+                            max: max_value,
+                            title: {
+                                text: 'Points',
+                                align: 'high'
+                            },
+                            labels: {
+                                overflow: 'justify'
+                            },
+                            plotLines: status_lines,
+                        },
+                        tooltip: {
+                            valueSuffix: ' points'
+                        },
+                        plotOptions: {
+                            bar: {
+                                dataLabels: {
+                                    enabled: true
+                                }
+                            }
+                        },
+                        credits: {
+                            enabled: false
+                        },
+                        series: [{
+                            name: 'Progress',
+                            data: [points.points]
+                        }]
+                    });
+                }
+            );
         }
     );
 });
