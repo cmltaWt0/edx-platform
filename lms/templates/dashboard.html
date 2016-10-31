@@ -87,6 +87,7 @@ if(localStorage["honor_code_skipped"] == undefined || localStorage["honor_code_s
   font-size: 3em;
 }
 </style>
+% if user.username in settings.GAMMA_ALLOWED_USERS:
 <script>
 Highcharts.setOptions({
      colors: [
@@ -253,6 +254,7 @@ $(function() {
     );
 });
 </script>
+% endif
 
   % if settings.FEATURES.get('ENABLE_DASHBOARD_SEARCH'):
     <%static:require_module module_name="js/search/dashboard/dashboard_search_factory" class_name="DashboardSearchFactory">
@@ -419,6 +421,7 @@ input[data-bind-element]{
     %endif
 </div>
 
+% if user.username in settings.GAMMA_ALLOWED_USERS:
 <div class="chart-holder" style="max-width:1180px; margin:0 auto; padding: 20px 0 0;">
     <script src="https://code.highcharts.com/highcharts.js"></script>
     <script src="https://code.highcharts.com/modules/exporting.js"></script>
@@ -428,6 +431,7 @@ input[data-bind-element]{
     </div>
     <div id="container-badges"></div>
 </div>
+% endif
 
 <section class="container dashboard" id="dashboard-main">
       <section class="my-courses" id="my-courses" role="main" aria-label="Content">

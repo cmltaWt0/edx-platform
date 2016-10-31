@@ -55,7 +55,7 @@ urlpatterns = patterns(
     url(r'^insert_search_tag$', 'util.views.add_keyword'),
 
     url(r'^delete_search_tag$', 'util.views.rem_keyword'),
-    url(r'^apple-app-site-association', 'util.views.apple_app_site_association'),
+    #url(r'^apple-app-site-association', 'util.views.apple_app_site_association'),
     url(r'^upload_video$', 'util.views.video_upload'),
     url(r'^upload$', 'util.views.upload'),
     url(r'^list_s3_videos$', 'util.views.s3_video_list'),
