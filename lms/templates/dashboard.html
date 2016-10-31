@@ -232,7 +232,20 @@ $(function() {
                             plotLines: status_lines,
                         },
                         tooltip: {
-                            valueSuffix: ' points<br>'+'Points to next status: '+'<b>'+points_to_status+'</b>'
+                            shared: true,
+                            useHTML: true,
+                            formatter: function() {
+                                tooltip_html = 'Points to next status: '+'<b>'+points_to_status+'</b>';
+                                tooltip_html += "<table>";
+
+                                this.points.forEach(function(entry) {
+                                    tooltip_html += '<tr><td style="font-weight:bold; color:'+ entry.series.color +'">'+ entry.series.name +':</td><td style="text-align: right"> '+entry.y+'</td></tr>';
+                                });
+
+                                tooltip_html += "</table>";
+
+                                return tooltip_html;
+                            },
                         },
                         plotOptions: {
                             bar: {
