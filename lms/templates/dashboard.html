@@ -198,6 +198,7 @@ $(function() {
                     }
                     else {
                         var max_value = Math.min(...right) + 20;
+                        var points_to_status = max_value - points.points - 20;
                     }
                     if (min_value < 0) {
                         min_value = 0;
@@ -231,7 +232,7 @@ $(function() {
                             plotLines: status_lines,
                         },
                         tooltip: {
-                            valueSuffix: ' points'
+                            valueSuffix: ' points<br>'+'Points to next status: '+'<b>'+points_to_status+'</b>'
                         },
                         plotOptions: {
                             bar: {
