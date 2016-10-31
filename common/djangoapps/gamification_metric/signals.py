@@ -5,6 +5,7 @@ import json
 
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.conf import settings
 
 from opaque_keys.edx.keys import CourseKey
 from tasks import send_api_request
@@ -14,7 +15,8 @@ from referrals.models import ActivatedLinks
 
 @receiver(post_save, sender='courseware.StudentModule')
 def send_achievement(sender, instance, **kwargs):
-    if instance.module_type in ('video', 'problem'):
+    # Remove check for GAMMA_ALLOWED_USERS after release
+    if instance.module_type in ('video', 'problem') and instance.student.username in settings.GAMMA_ALLOWED_USERS:
         if instance.module_type == 'video' and (instance.modified - instance.created).total_seconds() <= 1:
             return None
         if instance.module_type == 'problem' and (not instance.grade or type(instance.grade) != float):
@@ -30,7 +32,8 @@ def send_achievement(sender, instance, **kwargs):
 
 @receiver(post_save, sender='student.CourseEnrollment')
 def send_enroll_achievement(sender, instance, created, **kwargs):
-    if created and instance.is_active:
+    # Remove check for GAMMA_ALLOWED_USERS after release
+    if created and instance.is_active and instance.user.username in settings.GAMMA_ALLOWED_USERS:
         course_id = unicode(instance.course_id)
         data = {
             'username': instance.user.username,
@@ -60,7 +63,8 @@ def send_enroll_achievement(sender, instance, created, **kwargs):
 
 @receiver(post_save, sender='certificates.GeneratedCertificate')
 def send_certificate_generation(sender, instance, created, **kwargs):
-    if instance.status == CertificateStatuses.generating:
+    # Remove check for GAMMA_ALLOWED_USERS after release
+    if instance.status == CertificateStatuses.generating and instance.user.username in settings.GAMMA_ALLOWED_USERS:
         course_id = unicode(instance.course_id)
         data = {
             'username': instance.user.username,
