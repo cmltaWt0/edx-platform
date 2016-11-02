@@ -32,6 +32,7 @@ Longer TODO:
 import sys
 import os
 import imp
+import csv
 
 from path import Path as path
 from warnings import simplefilter
@@ -2684,6 +2685,15 @@ FINANCIAL_ASSISTANCE_MIN_LENGTH = 800
 FINANCIAL_ASSISTANCE_MAX_LENGTH = 2500
 
 
-GAMMA_ALLOWED_USERS = set([
-    'staff',
-])
+allowed = []
+
+try:
+    with open(os.path.join(PROJECT_ROOT, 'allowed_users.csv'), 'rb') as csvfile:
+        reader = csv.reader(csvfile, delimiter=' ', quotechar='|')
+        allowed = []
+        for row in reader:
+            allowed.extend(row)
+except IOError:
+    pass
+
+GAMMA_ALLOWED_USERS = set(allowed)
