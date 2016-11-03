@@ -87,6 +87,7 @@ if(localStorage["honor_code_skipped"] == undefined || localStorage["honor_code_s
   font-size: 3em;
 }
 </style>
+% if user.username in settings.GAMMA_ALLOWED_USERS:
 <script>
 Highcharts.setOptions({
      colors: [
@@ -197,6 +198,7 @@ $(function() {
                     }
                     else {
                         var max_value = Math.min(...right) + 20;
+                        var points_to_status = max_value - points.points - 20;
                     }
                     if (min_value < 0) {
                         min_value = 0;
@@ -230,7 +232,20 @@ $(function() {
                             plotLines: status_lines,
                         },
                         tooltip: {
-                            valueSuffix: ' points'
+                            shared: true,
+                            useHTML: true,
+                            formatter: function() {
+                                tooltip_html = 'Points to next status: '+'<b>'+points_to_status+'</b>';
+                                tooltip_html += "<table>";
+
+                                this.points.forEach(function(entry) {
+                                    tooltip_html += '<tr><td style="font-weight:bold; color:'+ entry.series.color +'">'+ entry.series.name +':</td><td style="text-align: right"> '+entry.y+'</td></tr>';
+                                });
+
+                                tooltip_html += "</table>";
+
+                                return tooltip_html;
+                            },
                         },
                         plotOptions: {
                             bar: {
@@ -253,6 +268,7 @@ $(function() {
     );
 });
 </script>
+% endif
 
   % if settings.FEATURES.get('ENABLE_DASHBOARD_SEARCH'):
     <%static:require_module module_name="js/search/dashboard/dashboard_search_factory" class_name="DashboardSearchFactory">
@@ -419,6 +435,7 @@ input[data-bind-element]{
     %endif
 </div>
 
+% if user.username in settings.GAMMA_ALLOWED_USERS:
 <div class="chart-holder" style="max-width:1180px; margin:0 auto; padding: 20px 0 0;">
     <script src="https://code.highcharts.com/highcharts.js"></script>
     <script src="https://code.highcharts.com/modules/exporting.js"></script>
@@ -428,6 +445,7 @@ input[data-bind-element]{
     </div>
     <div id="container-badges"></div>
 </div>
+% endif
 
 <section class="container dashboard" id="dashboard-main">
       <section class="my-courses" id="my-courses" role="main" aria-label="Content">
