@@ -109,7 +109,7 @@ $(function() {
                 function( data ) {
                     var events = [];
                     for (var key in data) {
-                        events.push({name: key, y : data[key]});
+                        events.splice(data[key][0], 0, {name: key, y : data[key][1]});
                     }
                     $('#container-chart').highcharts({
                         chart: {
