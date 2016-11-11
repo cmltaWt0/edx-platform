@@ -2402,6 +2402,9 @@ def _get_course_programs(user, user_enrolled_courses):  # pylint: disable=invali
 def honorcode(request):
     return render_to_response("honor_code.html", {})
 
+def amp(request):
+    return render_to_response("fly.html", {})
+
 @login_required
 def accept_honorcode(request):
     user = request.user

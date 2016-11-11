@@ -82,8 +82,11 @@ urlpatterns = (
     url(r'^capture_if_passed$', 'courseware.views.capture_pass_criteria_attained'),
     # Feedback Form endpoint
     url(r'^submit_feedback$', 'util.views.submit_feedback'),
+    url(r'^search_courses$', 'util.views.search'),
     url(r'^apple-app-site-association$', 'util.views.apple_app_site_association'),
     url(r'^honor_code$', 'student.views.honorcode'),
+    url(r'^amp$', 'student.views.amp'),
+
     url(r'^accept_honor_code$', 'student.views.accept_honorcode'),
     # Enrollment API RESTful endpoints
     url(r'^api/enrollment/v1/', include('enrollment.urls')),
