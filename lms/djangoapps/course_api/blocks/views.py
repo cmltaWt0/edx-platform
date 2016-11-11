@@ -15,7 +15,6 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 from .api import get_blocks
 from .forms import BlockListGetForm
 
-
 @view_auth_classes()
 class BlocksView(DeveloperErrorViewMixin, ListAPIView):
     """
@@ -166,19 +165,27 @@ class BlocksView(DeveloperErrorViewMixin, ListAPIView):
             raise ValidationError(params.errors)
 
         try:
-            return Response(
-                get_blocks(
-                    request,
-                    params.cleaned_data['usage_key'],
-                    params.cleaned_data['user'],
-                    params.cleaned_data['depth'],
-                    params.cleaned_data.get('nav_depth'),
-                    params.cleaned_data['requested_fields'],
-                    params.cleaned_data.get('block_counts', []),
-                    params.cleaned_data.get('student_view_data', []),
-                    params.cleaned_data['return_type']
-                )
+            blocks = get_blocks(
+                request,
+                params.cleaned_data['usage_key'],
+                params.cleaned_data['user'],
+                params.cleaned_data['depth'],
+                params.cleaned_data.get('nav_depth'),
+                params.cleaned_data['requested_fields'],
+                params.cleaned_data.get('block_counts', []),
+                params.cleaned_data.get('student_view_data', []),
+                params.cleaned_data['return_type']
             )
+    	    def remove_blocks_by_displayname(blocks, displayname):
+	        block_ids = []
+	        for block in blocks.get("blocks"):
+        	    if blocks["blocks"].get(block).get('display_name').upper() == displayname.upper():
+	                block_ids.append(block)
+	        for block_id in block_ids:
+        	    blocks["blocks"].pop(block_id)
+	        return blocks
+
+            return Response(remove_blocks_by_displayname(blocks, "Yammer"))
         except ItemNotFoundError as exception:
             raise Http404("Block not found: {}".format(exception.message))
 
