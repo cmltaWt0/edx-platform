@@ -88,15 +88,24 @@ if(localStorage["honor_code_skipped"] == undefined || localStorage["honor_code_s
 }
 </style>
 % if user.username in settings.GAMMA_ALLOWED_USERS:
+<link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
 <script>
 Highcharts.setOptions({
      colors: [
-         '#33ACD4',
-         '#008E00',
-         '#0094C2',
-         '#8CDEEB',
-         '#55C900',
-     ]
+         '#4599C3',
+         '#84BD00',
+         '#FFCD00',
+         '#E87722',
+         '#00B5E2',
+         '#6244BB',
+         '#888B8D',
+         '#FF0000',
+     ],
+     chart: {
+        style: {
+            fontFamily: "'Open Sans', sans-serif"
+        }
+    }
 });
 $(function() {
     $.get(
@@ -137,7 +146,8 @@ $(function() {
                                     distance: -50,
                                     style: {
                                         fontWeight: 'bold',
-                                        color: 'white'
+                                        color: 'white',
+                                        textShadow: 'unset'
                                     }
                                 },
                                 startAngle: -90,
