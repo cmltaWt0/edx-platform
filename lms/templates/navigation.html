@@ -94,7 +94,11 @@ $("yammer").each(function(){
 	var CurrentTitle = getSubTitle();
 	var Title = CourseTitle + " - "+ CurrentTitle;
 	var type = $(this).attr("type");
-	if(type == "embed"){debugger;
+        var url = window.location.href;
+        if($(this).attr("y-version") == "1.0"){
+                url = url.replace(".amat.com/courses/", "/courses/")
+        }
+	if(type == "embed"){
 		var custom_prompt = $(this).attr("data-prompt") || "Have a feedback or question?";
 		var grpId = $(this).attr("data-group-id")
 		$(this).append("<h2><span style='font-size: 1em; letter-spacing: 1px; line-height: 1.2em;'>Discuss this course on Yammer</span></h2><div id='embedded-feed' style='height: 500px; width: 100%;'></div><script src='https://assets.yammer.com/assets/platform_embed.js'/>");
@@ -103,7 +107,7 @@ $("yammer").each(function(){
 				container: "#embedded-feed",
 				network: 'amat.com',
 				objectProperties: {
-					"url": window.location.href,
+					"url": url,
 					"title": Title           	
 				},
 				feedType: "open-graph",
