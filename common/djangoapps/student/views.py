@@ -2405,6 +2405,9 @@ def honorcode(request):
 def amp(request):
     return render_to_response("fly.html", {})
 
+def pointsfaq(request):
+    return render_to_response("points_faq.html", {})
+
 @login_required
 def accept_honorcode(request):
     user = request.user

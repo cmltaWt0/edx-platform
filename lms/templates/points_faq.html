@@ -1,0 +1,107 @@
+<%! from django.core.urlresolvers import reverse %>
+<%namespace name='static' file='/static_content.html'/>
+
+<%inherit file="/main.html" />
+
+<%block name="title"><title>About appliedx</title></%block>
+
+<%block name="js_extra">
+</%block>
+<div style="
+  background: #fbfbfb;
+  background-size: cover;
+  background-image: url(&quot;/static/themes/stanford/images/points.png&quot;);
+  background-position: center top !important;
+  border-bottom: 1px solid #afd3e0;
+  box-shadow: 0 0px 8px 0 rgba(0,0,0,0.2),0 1px 12px 0 rgba(0,0,0,0.3);
+  height: 330px;
+  /* margin-top: -80px; */
+  width: 100%;
+  /* float: left; */
+  /* height: 100%; */
+  background-size: 110%;
+  background-repeat: no-repeat;
+  margin-top: 16px;
+  ">
+</div><section class="container about" style="width: auto;">
+  <nav id="about-menu">
+
+    <a href="#faq" class="faq">About points</a>
+  </nav>
+<style>
+.faq-header{    margin: 45px 0px 30px 0px;    font-size: 30px;    color: #243177;}
+.faq {
+    line-height: 21px;
+    font-weight: bold;
+    margin: 10px 0px 5px 0px;
+    font-family: arial;
+    color: #2196F3;
+    font-size: 13px;
+}
+.faq-answer {
+    line-height: 23px;
+    font-family: arial;
+    font-size: 12px;
+}
+.faq-emph{
+    text-align: center;
+    color: #777;
+    font-weight: bold;
+    font-size: 21px;
+    margin: 25px;
+}
+.faq-answer img{
+    max-width: 100%;
+    margin-bottom: 25px
+}
+</style>
+
+<div class="faq-header">Announcing appliedx reward points!</div>
+<div  class="faq">Corporate learning just got a big dose of fun: you can now earn rewards any time you take a course on appliedx!</div>
+<div class="faq-answer">
+Little activities on appliedx will earn you ‘enlightenment points’ – get points when you enroll in courses, watch videos, attempt quizzes, recommend courses to colleagues and complete courses. As you add points, cool badges will appear on your appliedx dashboard.
+When you get enough points and badges, you can trade them in for tangible rewards 
+Here’s how to track your points:
+  <ol>
+	<li>	No need to sign up: your appliedx ‘enlightenment points’ will start building up automatically as you complete certain activities on appliedx. For example, you get 1 point when you enroll in a course, 5 points when you watch a video, 10 points when you refer the course to a friend and a whopping 50 points when you complete it.</li>
+	<li>	To view your points, go to the appliedx dashboard. You can access this page by clicking either on the appliedx logo at the top left of the appliedx page, or your username at the top right. <div><img src='/static/themes/stanford/images/dashboardlink.png'/></div></li>
+	<li>	On the dashboard, you will see your points divided by category, points needed to get to the next level and all the badges you have earned. <img src='/static/themes/stanford/images/points_dashboard.png'/></li>
+	<li>	Hover over the different elements of the points dashboard and the badges to learn more about them!</li>
+ 	<li>Look out for opportunities to convert the points and badges into rewards! </li>
+  </ol>
+</div>
+<div class="faq-emph">That’s it! Get started today</div>
+<div class="faq-header">Frequently asked questions</div>
+<div class="faq">What are points? </div>
+<div class="faq-answer">Points are a quick way to indicate how much time on appliedx is spent by an individual. It’s a learning indicator, the more you learn better will be your points.  </div>
+<div class="faq">How can I get points?</div>
+<div class="faq-answer">Points will be added up for activities you perform on appliedx. At present, your points will be improved for doing the following activities on a verified course -
+	<ul>
+	<li>Enroll to a course - 1 point</li>
+	<li>Solve a problem - 2 points</li>
+	<li>Watch a video - 5 points</li>
+	<li>Refer a friend - 10 points</li>
+	<li>Complete a course - a whopping 50 points</li>
+</ol> </div>
+<div class="faq">What is a verified course and how do I recognize it?</div>
+<div class="faq-answer">Verified courses are the courses created by highly skilled subject matter experts on request. These are verified and validated by the team of experts with one or more </div><div class="faq-answer">QA sessions before releasing. You can recognize them easily by verified label in the course listing page as shown below –</div>
+ <div><img src='/static/themes/stanford/images/tile.png'/></div>
+<div class="faq">How can I refer a friend?  </div>
+<div class="faq-answer">You can refer a course to friend with your referral link. To generate a referral link, go to progress page and click Invite friend button as shown below -</div>
+ <div><img src='/static/themes/stanford/images/referral.png'/></div>
+<div class="faq-answer">A referral link is generated in the text box next to the button. Share this link to your colleagues over mail or IM.</div>
+<div class="faq">When will the referral points credited to my account?</div>
+<div class="faq-answer">Every time someone enrolls to the course with your referral link, points are attributed to your account.</div>
+<div class="faq">Is there a limit on referral points can earn?</div>
+<div class="faq-answer">You can refer any number of times and keep getting points for every new enrollment happens with your referral link.</div>
+<div class="faq">I have completed few courses last week; do I get points for those?</div>
+<div class="faq-answer">No, you cannot get points for previous completions. </div>
+<div class="faq">Do I get points for completing question, even if it is wrong?</div>
+<div class="faq-answer">No, you can get points only for a right answer.</div>
+<div class="faq">I watched a video but did not get points, why?</div>
+<div class="faq-answer">You should watch complete video to get points. Please wait until the video ends.</div>
+
+
+</div>
+  
+

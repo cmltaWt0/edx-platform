@@ -86,6 +86,7 @@ urlpatterns = (
     url(r'^apple-app-site-association$', 'util.views.apple_app_site_association'),
     url(r'^honor_code$', 'student.views.honorcode'),
     url(r'^amp$', 'student.views.amp'),
+    url(r'^points_faq$', 'util.views.pointsfaq'),
 
     url(r'^accept_honor_code$', 'student.views.accept_honorcode'),
     # Enrollment API RESTful endpoints
