@@ -88,15 +88,24 @@ if(localStorage["honor_code_skipped"] == undefined || localStorage["honor_code_s
 }
 </style>
 % if user.username in settings.GAMMA_ALLOWED_USERS:
+<link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
 <script>
 Highcharts.setOptions({
      colors: [
-         '#33ACD4',
-         '#008E00',
-         '#0094C2',
-         '#8CDEEB',
-         '#55C900',
-     ]
+         '#4599C3',
+         '#84BD00',
+         '#FFCD00',
+         '#E87722',
+         '#00B5E2',
+         '#6244BB',
+         '#888B8D',
+         '#FF0000',
+     ],
+     chart: {
+        style: {
+            fontFamily: "'Open Sans', sans-serif"
+        }
+    }
 });
 $(function() {
     $.get(
@@ -109,7 +118,7 @@ $(function() {
                 function( data ) {
                     var events = [];
                     for (var key in data) {
-                        events.push({name: key, y : data[key]});
+                        events.splice(data[key][0], 0, {name: key, y : data[key][1]});
                     }
                     $('#container-chart').highcharts({
                         chart: {
@@ -118,7 +127,7 @@ $(function() {
                             plotShadow: false
                         },
                         title: {
-                            text: '<h1>Your points</h1>',
+                            text: '<h1>Your Enlightenment Points</h1>',
                             align: 'center'
                         },
                         subtitle: {
@@ -137,7 +146,8 @@ $(function() {
                                     distance: -50,
                                     style: {
                                         fontWeight: 'bold',
-                                        color: 'white'
+                                        color: 'white',
+                                        textShadow: 'unset'
                                     }
                                 },
                                 startAngle: -90,
@@ -148,7 +158,7 @@ $(function() {
                         },
                         series: [{
                             type: 'pie',
-                            name: 'Browser share',
+                            name: 'Points share',
                             innerSize: '50%',
                             data: events
                         }]
@@ -161,7 +171,7 @@ $(function() {
                 function( data ) {
                     for (i in data) {
                         $('#container-badges').append(
-                            '<img src="'+data[i].url+'" alt="'+data[i].description+'" title="'+data[i].description+'"'+'" height="100" width="100">'
+                            '<img src="'+data[i].url+'" alt="'+data[i].description+'" title="'+data[i].description+'"'+'" height="200" width="200">'
                         );
                     }
                 }
@@ -208,7 +218,7 @@ $(function() {
                             type: 'bar'
                         },
                         title: {
-                            text: 'Your Points Progress'
+                            text: 'Points to the Next Level'
                         },
                         subtitle: {
                             text: ''
@@ -443,7 +453,13 @@ input[data-bind-element]{
       <div id="container-chart" style="width: 35%; height: 400px;"></div>
       <div id="container-progress" style="width: 65%; height: 400px;"></div>
     </div>
-    <div id="container-badges"></div>
+    <div id="container-badges" style="padding: 20px 0 0;">
+    <header style="text-align: center">
+      <text style="color:#333333;font-size:18px;fill:#333333;width:265px;">
+          Your Badge Pack
+      </text>
+    </header>
+    </div>
 </div>
 % endif
 
