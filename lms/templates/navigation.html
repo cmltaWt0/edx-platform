@@ -67,15 +67,30 @@ site_status_msg = get_site_status_msg(course_id)
         	        $("#updatedOnCourseReset").css("height", $(document).height());
 			if(!localStorage["updatedOnShowcase"]) {
                         	document.getElementById("updatedOnCourseReset").style.display="block";
-                	}	
+                	}
 		}, 2000);
 		function closepopup()
 		{
 			document.getElementById("updatedOnCourseReset").style.display="none";
 			localStorage["updatedOnShowcase"]=false;
 		}
-	
+
 	</script>
+<script type="text/javascript">
+$(function() {
+  function getPoints() {
+    $.get(
+        "${settings.FEATURES['GAMMA_PROPERTIES']['API_URL']}"+"points/",
+        data={"username": "${ user.username | h }"},
+        function( points ) {
+            $("ol.user-points li a").html("You got " + points.points + " points");
+        }
+    );
+  }
+  getPoints();
+  setInterval(getPoints, 60000);
+});
+</script>
 <script type="text/javascript">
 function getPageTitle(){
 	$("*", $(".provider").parent()).show();
@@ -108,7 +123,7 @@ $("yammer").each(function(){
 				network: 'amat.com',
 				objectProperties: {
 					"url": url,
-					"title": Title           	
+					"title": Title
 				},
 				feedType: "open-graph",
 				config: {
@@ -254,7 +269,12 @@ header.global .user>.primary:last-child>a {
     </li>
     </ol>
     % endif
-         <ol class="help authenticated" style="float:right; margin-top:5px; margin-right:50px; cursor:pointer;" >     
+    <ol class="user-points" style="float:right; margin-top:5px; margin-right:50px; cursor:pointer;" >
+     <li>
+       <a href="/dashboard"></a>
+     </li>
+    </ol>
+         <ol class="help authenticated" style="float:right; margin-top:5px; margin-right:50px; cursor:pointer;" >
       <li class="nav-global-01">
         <a href="#" onclick="document.getElementById('customhelp').style.display='block'">Help</a>
       </li>
@@ -314,9 +334,9 @@ header.global .user>.primary:last-child>a {
 	.chtrigger:hover{
 		color:#62962e;
 		border-bottom:dotted 1px #62962e;
-	} 
+	}
    .appliedx-notification-content{ padding: 8px;font-family: calibri;}
-		
+
 	</style>
 	<h1>Appliedx Help</h1>
 	Welcome to appliedx help, you can raise your issues via following methods -
@@ -331,7 +351,7 @@ header.global .user>.primary:last-child>a {
 			<img src="/static/themes/stanford/images/help2.png"/>
 		</li>
 		<li>4. If there is no way you will meet the progress criterion for the course. Please follow the steps below to reset your attempts -
-    
+
     <div class="appliedx-notification-content" style="float:none">
 				<ul>
 					<li>A. Open the dashboard and find the course attempts you want to reset</li>
@@ -343,13 +363,13 @@ header.global .user>.primary:last-child>a {
 						<div><img src="/static/themes/stanford/images/resetconfirm.png" style="height: 100px;"></div>
 					</li>
 				</ul>
-  		 
+
     </li>
 	</ol>
 	<h2>Raise a ticket</h2>
 	You can contact help desk if you are having any issue related to login, register or AGU credit. You can also raise a ticket if you are facing problem in accessing the video or course content. Click here to raise a ticket using <a target="_blank" onclick="document.getElementById('customhelp').style.display='none'" href="https://amat.service-now.com/AMAT3/submit_ticket.do?sysparm_url=com.glideapp.servicecatalog_cat_item_view.do%3Fv%3D1%26sysparm_id%3Da9407bce8de239002043d9779f0438dd%26keyword%3DAll%20Summaries%26summary_category%3DAppliedX%26summary%3DAppliedX%20Application&step2=197062b144dc71001e5e858bd9ecf95b">SERVICE NOW </a>
 	<h2>Questions/ Feedback: Use Yammer Feature</h2>
-	You can enter your comments/feedback using yammer feature in appliedx. You can also ask questions to the instructor using yammer. 
+	You can enter your comments/feedback using yammer feature in appliedx. You can also ask questions to the instructor using yammer.
 <!--	<h2>Send us a mail</h2>
 	You can also raise a concern or issue by writing to us at <a href="mailto:appliedx_info@amat.com">appliedx_info@amat.com </a> --> <br/>
 	<div class='closebutton' onclick="document.getElementById('customhelp').style.display='none'" >Close Help</div>
@@ -363,4 +383,3 @@ header.global .user>.primary:last-child>a {
 % endif
 
 <%include file="help_modal.html"/>
-
