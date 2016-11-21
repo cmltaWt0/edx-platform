@@ -76,6 +76,7 @@ site_status_msg = get_site_status_msg(course_id)
 		}
 
 	</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/notify/0.4.2/notify.min.js"></script>
 <script type="text/javascript">
 $(function() {
   function getPoints() {
@@ -89,6 +90,26 @@ $(function() {
   }
   getPoints();
   setInterval(getPoints, 60000);
+  function getNewEvents() {
+      $.get(
+          "${settings.FEATURES['GAMMA_PROPERTIES']['API_URL']}"+"logged-event/",
+          data={"username": "${ user.username | h }"},
+          function( events ) {
+              for (i in events) {
+                  $.notify(
+                      "New event with type "+events[i].event_type+" appeared.\nYou have got "+events[i].rewarded_points+" points.",
+                      {
+                          clickToHide: true,
+                          className: 'info',
+                          autoHide: false,
+                      }
+                  );
+              }
+          }
+      );
+  }
+  getNewEvents();
+  setInterval(getNewEvents, 300000);
 });
 </script>
 <script type="text/javascript">
