@@ -27,9 +27,10 @@ class APICalls(object):
                         "You must set `{}` in `GAMMA_PROPERTIES`".format(param)
                     )
 
-    def api_call(self, course_id, username, event_type, uid):
+    def api_call(self, course_id, org, username, event_type, uid):
         data = {
             'course_id': course_id,
+            'org': org,
             'username': username,
             'event_type': event_type,
             'uid': uid,

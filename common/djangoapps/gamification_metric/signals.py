@@ -16,14 +16,24 @@ from referrals.models import ActivatedLinks
 @receiver(post_save, sender='courseware.StudentModule')
 def send_achievement(sender, instance, **kwargs):
     # Remove check for GAMMA_ALLOWED_USERS after release
-    if instance.module_type in ('video', 'problem') and instance.student.username in settings.GAMMA_ALLOWED_USERS:
-        if instance.module_type == 'video' and (instance.modified - instance.created).total_seconds() <= 1:
+    if (
+        instance.module_type in ('video', 'problem') and
+        instance.student.username in settings.GAMMA_ALLOWED_USERS
+    ):
+        if (
+            instance.module_type == 'video' and
+            (instance.modified - instance.created).total_seconds() <= 1
+        ):
             return None
-        if instance.module_type == 'problem' and (not instance.grade or type(instance.grade) != float):
+        if (
+            instance.module_type == 'problem' and
+            (not instance.grade or type(instance.grade) != float)
+        ):
             return None
         data = {
             'username': instance.student.username,
             'course_id': unicode(instance.course_id),
+            'org': instance.course_id.org,
             'event_type': instance.module_type,
             'uid': unicode(instance.module_state_key),
         }
@@ -33,11 +43,17 @@ def send_achievement(sender, instance, **kwargs):
 @receiver(post_save, sender='student.CourseEnrollment')
 def send_enroll_achievement(sender, instance, created, **kwargs):
     # Remove check for GAMMA_ALLOWED_USERS after release
-    if created and instance.is_active and instance.user.username in settings.GAMMA_ALLOWED_USERS:
+    if (
+        created and
+        instance.is_active and
+        instance.user.username in settings.GAMMA_ALLOWED_USERS
+    ):
+        org = instance.course_id.org
         course_id = unicode(instance.course_id)
         data = {
             'username': instance.user.username,
             'course_id': course_id,
+            'org': org,
             'event_type': 'enrollment',
             'uid': '{}_{}'.format(instance.user.pk, course_id),
         }
@@ -49,10 +65,15 @@ def send_enroll_achievement(sender, instance, created, **kwargs):
             used=False
         ).first()
         if activated_link:
-            uid = '{}_{}_{}'.format(activated_link.referral.user.pk, activated_link.referral.course_id, 'referrer')
+            uid = '{}_{}_{}'.format(
+                activated_link.referral.user.pk,
+                activated_link.referral.course_id,
+                'referrer'
+            )
             data = {
                 'username': activated_link.referral.user.username,
                 'course_id': course_id,
+                'org': org,
                 'event_type': 'referrer',
                 'uid': uid
             }
@@ -61,14 +82,20 @@ def send_enroll_achievement(sender, instance, created, **kwargs):
             # TODO uncomment this after debug finishing
             # activated_link.save()
 
+
 @receiver(post_save, sender='certificates.GeneratedCertificate')
 def send_certificate_generation(sender, instance, created, **kwargs):
     # Remove check for GAMMA_ALLOWED_USERS after release
-    if instance.status == CertificateStatuses.generating and instance.user.username in settings.GAMMA_ALLOWED_USERS:
+    if (
+        instance.status == CertificateStatuses.generating and
+        instance.user.username in settings.GAMMA_ALLOWED_USERS
+    ):
+        org = instance.course_id.org
         course_id = unicode(instance.course_id)
         data = {
             'username': instance.user.username,
             'course_id': course_id,
+            'org': org,
             'event_type': 'course',
             'uid': '{}_{}'.format(instance.user.pk, course_id),
         }
