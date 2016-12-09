@@ -90,28 +90,61 @@ $(function() {
   }
   getPoints();
   setInterval(getPoints, 60000);
+  var colors = [
+      '#4599C3',
+      '#84BD00',
+      '#FFCD00',
+      '#E87722',
+      '#00B5E2',
+      '#6244BB',
+      '#888B8D',
+      '#FF0000',
+  ];
   function getNewEvents() {
       $.get(
           "${settings.FEATURES['GAMMA_PROPERTIES']['API_URL']}"+"logged-event/",
           data={"username": "${ user.username | h }"},
           function( events ) {
               for (i in events) {
+                  $.notify.addStyle('amatstyle', {
+                    html: "<div><div class='clearfix'><div class='title' data-notify-html='title'/></div>",
+                    classes: {
+                      base: {
+                        "white-space": "nowrap",
+                        "background-color": colors[events[i].color],
+                        "padding": "5px"
+                      }
+                    }
+                  });
                   $.notify(
-                      "New event with type "+events[i].event_type+" appeared.\nYou have got "+events[i].rewarded_points+" points.",
                       {
-                          clickToHide: true,
-                          className: 'info',
-                          autoHide: false,
+                          title: "New event with type "+events[i].event_type+" appeared."+"<br>"+"You have got <b>"+events[i].rewarded_points+"</b> points."
+                      },
+                      {
+                          clickToHide: false,
+                          style: 'amatstyle',
+                          autoHide: true
                       }
                   );
               }
           }
       );
+      setTimeout(getNewEvents, 300000)
   }
   setTimeout(getNewEvents, 60000)
-  setInterval(getNewEvents, 300000);
 });
 </script>
+<style>
+.notifyjs-amatstyle-base {
+  opacity: 0.85;
+  border-radius: 10px;
+}
+
+.notifyjs-amatstyle-base .title {
+  margin: 10px 10px 10px 10px;
+
+}
+</style>
 <script type="text/javascript">
 function getPageTitle(){
 	$("*", $(".provider").parent()).show();
