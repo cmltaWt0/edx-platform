@@ -21,7 +21,9 @@ from openedx.core.djangoapps.video_pipeline.models import VideoUploadsEnabledByD
 from openedx.core.lib.license import LicenseMixin
 from openedx.core.lib.teams_config import TeamsConfig  # lint-amnesty, pylint: disable=unused-import
 from xmodule import course_metadata_utils
-from xmodule.course_metadata_utils import DEFAULT_GRADING_POLICY, DEFAULT_START_DATE
+from xmodule.course_metadata_utils import (
+    DEFAULT_GRADING_POLICY, DEFAULT_START_DATE, get_default_grading_policy_override,
+)
 from xmodule.data import CertificatesDisplayBehaviors
 from xmodule.graders import grader_from_conf
 from xmodule.seq_block import SequenceBlock
@@ -1120,11 +1122,15 @@ class CourseBlock(
         The JSON object can have the keys GRADER and GRADE_CUTOFFS. If either is
         missing, it reverts to the default.
         """
+        grading_policy_override = get_default_grading_policy_override(self.org)
+
         if course_policy is None:
             course_policy = {}
-
+        import json
         # Load the global settings as a dictionary
-        grading_policy = self.grading_policy
+        grading_policy = json.loads(json.dumps(grading_policy_override))
+
+        log.info("grading_policy_override: %s", grading_policy)
         # BOY DO I HATE THIS grading_policy CODE ACROBATICS YET HERE I ADD MORE (dhm)--this fixes things persisted w/
         # defective grading policy values (but not None)
         if 'GRADER' not in grading_policy:
@@ -1132,8 +1138,10 @@ class CourseBlock(
         if 'GRADE_CUTOFFS' not in grading_policy:
             grading_policy['GRADE_CUTOFFS'] = CourseFields.grading_policy.default['GRADE_CUTOFFS']
 
+        log.info("!!!!!course_policy: %s", course_policy)
+        log.info("!!!!!grading_policy: %s", grading_policy)
         # Override any global settings with the course settings
-        grading_policy.update(course_policy)
+        # grading_policy.update(course_policy)
 
         # Here is where we should parse any configurations, so that we can fail early
         # Use setters so that side effecting to .definitions works

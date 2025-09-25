@@ -10,9 +10,16 @@ classes, which both need these type of functions.
 from base64 import b32encode
 from datetime import datetime, timedelta
 from math import exp
+from dataclasses import dataclass
 
 import dateutil.parser
 from pytz import utc
+from typing import Dict, Any
+
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 DEFAULT_START_DATE = datetime(2030, 1, 1, tzinfo=utc)
 
@@ -53,6 +60,44 @@ DEFAULT_GRADING_POLICY = {
         "Pass": 0.5,
     },
 }
+
+
+@dataclass(frozen=True)
+class _GradingPolicy:
+    grading_policy: Dict[str, Any]
+
+    def is_valid(self):
+        ## TODO: implement real validation logic
+        return True
+
+
+def get_default_grading_policy_override(org: str | None = None) -> Dict[str, Any]:
+    from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
+
+    logger.info(f"Org is: {org}")
+    if SiteConfiguration.has_org(org):
+        if grading_org_override := SiteConfiguration.get_value_for_org(org, 'grading_policy'):
+            grading_policy = _GradingPolicy(
+                grading_policy=grading_org_override
+            )
+            logger.info(f"+++++ Grading for ORG policy is: {grading_policy.grading_policy}")
+            return grading_policy.grading_policy
+        else:
+            logger.error(f"Invalid grading policy for org {org}")
+    else:
+        site_configuration = SiteConfiguration.objects.all().first()
+        if grading_policy := site_configuration.get_value('grading_policy'):
+            logger.info(f"Found OVERRIDED policy: {grading_policy}")
+            grading_policy = _GradingPolicy(
+                grading_policy=grading_policy
+            )
+        else:
+            grading_policy = _GradingPolicy(
+                grading_policy=DEFAULT_GRADING_POLICY
+            )
+
+    logger.info(f"Final Grading policy is: {grading_policy.grading_policy}")
+    return grading_policy.grading_policy
 
 
 def clean_course_key(course_key, padding_char):
